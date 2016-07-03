@@ -1,0 +1,30 @@
+Message from Target (FindMyPhone) to Server (FindMyServer)
+
+[TargetKAlive:0:+14696646540]
+[FMPRSP:0 0]
+PH:
+DE:
+BA:99
+CH:AC
+MD:OFF
+GP:ON
+NW:ON
+TK:OFF
+LOC:1 <gps 2015/10/16 07:14:27 33.0738 -96.7236 8 237 2 0>
+LOC:2 <network 2015/10/16 07:14:25 33.0740 -96.7235 24 0 0>
+WF:ENC <<Yeah5>>
+[TargetResponseEnd]
+
+
+
+
+
+Message from Client (FindMyFamily) to Server (FindMyServer)
+
+[ClientGetLatest:11111111:14696646540]
+
+[ClientGetAllHistory:11111111:4692370549]
+
+[ClientGetServerStatus:1111111111:]
+
+[ClientGetLog:1111111111:12146824497]
