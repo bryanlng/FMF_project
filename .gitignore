@@ -10,6 +10,11 @@ t ls-files --others --exclude-from=.git/info/exclude
 *.class
 *.log
 *.lck
+*.zip
+*.number
 #
 # Linux build products
 #
+**/log/**
+**/dist/**
+**/build/**
