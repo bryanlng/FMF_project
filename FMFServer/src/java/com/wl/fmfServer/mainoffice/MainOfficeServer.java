@@ -23,6 +23,10 @@ public class MainOfficeServer {
         //  Open config file  (properties file)
         prop = Tools.getProperties(Tools.MAINOFFICE_PROPERTIES_FILE);
 
+        if (prop == null)
+        {
+        	return;
+        }
         //  create log object
         Tools.logger =  Logger.getLogger("com.wl.fmfServer.mainoffice");
 
