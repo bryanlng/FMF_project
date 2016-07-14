@@ -104,6 +104,8 @@ public class FMPLocationData{
             if (this.fMPLocations[i]!=null)
             {
                 wholeMessage += MSGTAG_LOCATION+ Integer.toString(locationCount) + " <";
+                wholeMessage += this.fMPLocations[i].returnStringFromObject();
+                /*
                 wholeMessage += fMPLocations[i].getProvider() + " ";
                 Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("CST"));
                 cal.setTimeInMillis(fMPLocations[i].getTime());
@@ -117,7 +119,7 @@ public class FMPLocationData{
                 // New added bearing and speed
                 wholeMessage += Math.round(fMPLocations[i].getBearing())+" ";
                 wholeMessage += Math.round((fMPLocations[i].getSpeed()*3600)/1609); // m/s to mi/h
-                /* Ignore no. of Sat for now
+                * Ignore no. of Sat for now
                 try {
                     if (i==LOCATION_GPS)
                     {
@@ -129,7 +131,9 @@ public class FMPLocationData{
                 {
                     System.out.println("No satallites info");
                 }
-                */
+                *
+                
+                **/
                 wholeMessage +=  ">\n";
                 locationCount++;
             }
@@ -312,35 +316,16 @@ public class FMPLocationData{
                 else if (lines[i].contains(MSGTAG_LOCATION))
                 {
                 // * LOC:1 <network 2014/01/20 17:33:22 32.9759 -96.7204 1210>
-                    String a = lines[i].substring(lines[i].indexOf("<")+1,lines[i].indexOf(">"));
-                    String[] result = a.split(" ");
-                    System.out.println("location has elmements:"+result.length);
-                    FMCRawLocation location = new FMCRawLocation(result[0]);
+                	FMCRawLocation location = new FMCRawLocation();
+                    String locationString = lines[i].substring(lines[i].indexOf("<")+1,lines[i].indexOf(">"));
 
-
-//                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z", Locale.ENGLISH);
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
-
-                    // sdf.setTimeZone(TimeZone.getTimeZone("CST"));
-                    //sdf.setCalendar(Calendar.getInstance(TimeZone.getTimeZone("CST")));
-//                    java.util.Date date = sdf.parse(new String(result[1]+" "+result[2]+ " CST"));
-                    java.util.Date date = sdf.parse(new String(result[1]+" "+result[2]));
-
-                    location.setTime(date.getTime());
-
-                    location.setLatitude (Double.parseDouble(result[3]));
-                    location.setLongitude(Double.parseDouble(result[4]));
-                    location.setAccuracy(Float.parseFloat(result[5]));
-                    if (result.length>=8)
-                    {
-                        location.setBearing(Float.parseFloat(result[6]));
-                        location.setSpeed(Float.parseFloat(result[7]));                            	
-                    }
-            
-                    if (result[0].equalsIgnoreCase(FMCRawLocation.LOCATION_GPS_STRING)){
+                	location.convertFromStringToObject(locationString);                	
+                	
+                	System.out.println("My location is "+location.getProvider());
+                    if (location.getProvider().equalsIgnoreCase(FMCRawLocation.LOCATION_GPS_STRING)){
                         fMPLocations[LOCATION_GPS] = location;
                     }
-                    else if (result[0].equalsIgnoreCase(FMCRawLocation.LOCATION_NETWORK_STRING)){
+                    else if (location.getProvider().equalsIgnoreCase(FMCRawLocation.LOCATION_NETWORK_STRING)){
                         fMPLocations[LOCATION_NETWORK] = location;
                     }
 
