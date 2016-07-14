@@ -298,13 +298,9 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                     			//Display # of targets
 	                    		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	                            String serverStartFormatted = dateFormat.format(Tools.getServerStart()); //Ex: 2014/08/06 15:59:48  
-//                    			int year = Tools.getServerStart().get(Calendar.YEAR);
-//                    			int month = Tools.getServerStart().get(Calendar.MONTH);
-//                    			int day_of_month= Tools.getServerStart().get(Calendar.DAY_OF_MONTH);
-//                    			String serverStartFormatted = year + "-" + month + "-" +day_of_month;
                     			int daysUp = Tools.compareDate(serverStartFormatted);
-                    			debugWrite("DaysUp:" + daysUp + " , Size:" + targetInfo.getNumOfLocations());
-                    			getOutBufferedWriter().write("DaysUp:" + daysUp + " , Size:" + targetInfo.getNumOfLocations());
+                    			debugWrite("DaysUp:" + daysUp + " , Size:" + MainOfficeServer.targetHT.size());
+                    			getOutBufferedWriter().write("DaysUp:" + daysUp + " , Size:" + MainOfficeServer.targetHT.size());
                             	getOutBufferedWriter().newLine();                        
   
 //                    		}
