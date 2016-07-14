@@ -1,5 +1,7 @@
 package com.wl.fmfServer.mainoffice;
 
+import com.william.fmfCommon.FMCRawLocation;
+import com.william.fmfCommon.FMPLocationData;
 import com.wl.fmfServer.data.TcpDataCommunication;
 import com.wl.fmfServer.data.Tools;
 
@@ -377,6 +379,13 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                     String retString = extraStringFromBF(
                     		getInReader(),addCommandBracket(FMFOFFICE_TARGETRESPONSE_END),null );
                     System.out.println("Extracted String:->"+retString+"<-");
+                    
+                    // Convert String to Object
+                    FMPLocationData locationData = new FMPLocationData();
+                    locationData.composeObjectFromMessage(retString, targetPhone);
+                    System.out.println("Converted this record:"+locationData.getPhoneNumber()+" to Object printout:->"+locationData+"<-");
+                    
+                    
                     MainOfficeServer.targetHT.put (targetPhone, this);  
                     
                     // Now put this info into LinkedList
