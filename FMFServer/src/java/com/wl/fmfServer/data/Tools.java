@@ -1,9 +1,10 @@
 package com.wl.fmfServer.data;
 
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.util.Vector;
 import java.security.MessageDigest;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 import java.io.FileInputStream;
@@ -58,7 +59,11 @@ public class Tools
 
     public static Logger logger;
     
-
+    public static Date serverStart;
+    
+    /*
+     * Assumes that prevDayAndTime comes in format yyyy-mm-dd
+     */
     public static int compareDate(String prevDayAndTime){
         // First line is the date
         Calendar today = Calendar.getInstance();
@@ -379,6 +384,15 @@ public class Tools
         }
         return bestLocation;
    	
+    }
+    
+    public static void startServerCalendar(){
+//    	serverStart = Calendar.getInstance();
+    	serverStart = new Date();
+    }
+    
+    public static Date getServerStart(){
+    	return serverStart;
     }
     		
     	

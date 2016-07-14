@@ -92,19 +92,18 @@ public class TcpDataCommunication
 
     private boolean setBuilders() {
         try {
-
-            outPrintWriter = new PrintWriter(
+            outPrintWriter = new PrintWriter(	//attempts to create a PrintWriter object from the socket's OutputStream
                   new BufferedWriter(
                   new OutputStreamWriter(
                       mySocket.getOutputStream())));
 
-            outBufferedWriter = new BufferedWriter(
+            outBufferedWriter = new BufferedWriter( //attempts to create a BufferedWriter object from the socket's OutputStream
                   new OutputStreamWriter(
                       mySocket.getOutputStream()));
 
             /* read response */
-            inReader = new BufferedReader(
-                    new InputStreamReader(
+            inReader = new BufferedReader(	//attempts to create a BufferedReader object from the socket's InputStream
+                    new InputStreamReader(  //the BufferedReader will allow us to read in responses
                     mySocket.getInputStream()));
         }
         catch (Exception e) {

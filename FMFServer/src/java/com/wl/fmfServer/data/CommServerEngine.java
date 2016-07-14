@@ -22,15 +22,17 @@ public abstract class CommServerEngine extends Thread
     public void run() {
         int i = 1;
 
-        if (secured) {
+        if (secured) {	//Secured server
             try {
+            	//Create a secured server socket bound to the port Number
                 SSLServerSocketFactory sslserversocketfactory =
                 (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
                 SSLServerSocket sslserversocket =
                 (SSLServerSocket) sslserversocketfactory.createServerSocket(portNumber);
                 System.out.println("secured Waiting for call on port number :"+portNumber);
 
-                for (;;) {
+                for (;;) {	
+                	//;; is an infinite loop. However,this is taken care of by the sslserversocket.accept() method,
                     SSLSocket sslsocket = (SSLSocket) sslserversocket.accept();
                     //System.out.println("secured accepted for call:"+i);
                     securedCommHandler(sslsocket);
@@ -41,16 +43,16 @@ public abstract class CommServerEngine extends Thread
                 exception.printStackTrace();
             }
         }
-        else {
+        else { //Unsecured server
 
-            try {
+            try { //Create a server socket bound to the port Number
 
                 // Create a ServerSocket to listen to
                 ServerSocket s = new ServerSocket(portNumber);
                 System.out.println("Unsecured Waiting for call on port number :"+portNumber);
 
                 // Loop forever at this thread to listen to incoming message
-                for (;;) {
+                for (;;) { //;; is an infinite loop. However,this is taken care of by the ServerSocket.accept() method,
                     Socket incoming = s.accept( );
                     // System.out.println("Unsecured accepted !!!!! " + i);
 

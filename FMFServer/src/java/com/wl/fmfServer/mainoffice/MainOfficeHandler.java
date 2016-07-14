@@ -7,8 +7,10 @@ import java.io.*;
 import java.net.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 import javax.net.ssl.SSLSocket;
 
@@ -22,7 +24,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 	
 
 	// Starts - Copy these to FMF and FMP
-    //Client Commands
+    //Client Commands. Client = from FindMyFamily. Client --> Server
     public static String FMFOFFICE_CLIENTLISTALL = "ClientListAll";
     public static String FMFOFFICE_CLIENTCOMMAND = "ClientCommand";
     public static String FMFOFFICE_CLIENTGETLATEST = "ClientGetLatest";    
@@ -51,7 +53,8 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
     //[TargetResponseBegin:1234567890:9876543210]
     //[FMPRSP:0 0]\nPH:\nDE:\nBA:80\nMD:ON\nGP:ON\nNW:ON\nTK:ON\nLOC:1 <gps 2015/01/19 15:53:19 33.0742 -96.7237 76 0 0 9>\nLOC:2 <network 2015/01/19 15:55:15 33.0687 -96.7122 1261 0 0>\nWF:ENC
     //[TargetResponseEnd]
-
+    
+    //Target = From cellphones FindMyPhone. Target --> Server
     public static String FMFOFFICE_TARGETLOGIN = "TargetLogin";
     public static String FMFOFFICE_TARGETKEEPALIVE = "TargetKAlive";
     public static String FMFOFFICE_TARGETLOG = "TargetLog";    
@@ -93,32 +96,37 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 
             boolean done = false;
             while (!done) {
-                String readString = getInReader().readLine();
+            		//gets the BufferedReader from the TCP superclass and reads the first line
+                String readString = getInReader().readLine();	
+                	//Prints out the format: yyyy-MM-dd HH:mm:ss: MainOfficeHandler: readString is :readString
+                	//where readstring = [TargetKAlive:0:+14696646540]
                 debugWrite("MainOfficeHandler: readString is :"+readString);
+                	
+                	//if the line is empty, print message saying string is empty, then end by breaking out of while loop
                 if (readString == null || readString.length() == 0)
                 {
                 	debugWrite("readString == null or length is 0. done");
                     done = true;
                     continue;
                 }
-
+                	
                 
-                readString=readString.substring(1, readString.length()-1);
+                readString=readString.substring(1, readString.length()-1); //Removes the [ ], ex: TargetKAlive:0:+14696646540
                 String delims = "[:]";
-                String[] tokens = readString.split(delims);
+                String[] tokens = readString.split(delims);	//extract the TargetKAlive, 0, +14696646540
                 String command=null;
-                String clientPhone = "X";
-                String targetPhone = "Y";                  
+                String clientPhone = "X";		//Phone that has FMF on it
+                String targetPhone = "Y";       //Phone that has FindMyPhone on it
                 if (tokens.length == 3)
                 {
-                    command = tokens[0];
-                    clientPhone = tokens[1];
-                    targetPhone = tokens[2]; 
+                    command = tokens[0];		//command = TargetKAlive
+                    clientPhone = tokens[1];	//clientPhone = 0
+                    targetPhone = tokens[2]; 	//targetPhone = +14696646540
                 }    
-                else if (tokens.length == 2)
+                else if (tokens.length == 2)	//Client request from FindMyFamily. Ex: [ClientGetServerStatus:1111111111:]
                 {
-                    command = tokens[0];
-                    clientPhone = tokens[1]; 
+                    command = tokens[0];		//command = ClientGetServerStatus
+                    clientPhone = tokens[1]; 	//clientPhone = 1111111111
                 }     
                 else if (tokens.length == 1)
                 {
@@ -129,25 +137,32 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                     debugWrite("Wrong format");                	
                     break;
                 }
-                targetPhone = Tools.trimPhoneNumber(targetPhone);
+                targetPhone = Tools.trimPhoneNumber(targetPhone);	//takes out the "+1" from the phone number
                 
                 debugWrite("MainOfficeHandler::command:"+command+", clientPhone:"+clientPhone+", targetPhone:"+targetPhone);
                 
-                if (command.equals(FMFOFFICE_CLIENTLISTALL)){
+                /************************Based on the command, do something different*******************************/
+                
+                if (command.equals(FMFOFFICE_CLIENTLISTALL)){	//If command = "ClientListAll"
+                		
+                	//getOutBufferedWriter() simply returns the BufferedWriter we got in setBuilders()
+                	//write "ClientListAllResponse" to the BufferedWriter
+                	getOutBufferedWriter().write(FMFOFFICE_CLIENTRESPONSE_LISTALL+"\n");	//ClientListAllResponse
 
-                	getOutBufferedWriter().write(FMFOFFICE_CLIENTRESPONSE_LISTALL+"\n");
-
+                	//gets list of all the keys in targetHT, the target list
+                	//Aka, gets all the targets and put them in an Enumeration<String>
                 	Enumeration<String> enumKey = MainOfficeServer.targetHT.keys();
-                	while(enumKey.hasMoreElements()) {
+                	while(enumKey.hasMoreElements()) {	//while there are still keys 
                 		String key = enumKey.nextElement();
-
+                		
                 		if(key==null || key.length() == 0)
                 		{
                 			continue;
                 		}
                 		else
                 		{
-                    		MainOfficeHandler val = MainOfficeServer.targetHT.get(key);
+                			System.out.println("Current key: " + key);
+                			MainOfficeHandler val = MainOfficeServer.targetHT.get(key);
                     		if (val == null)
                     		{
                     			continue;
@@ -158,10 +173,10 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                 			getOutBufferedWriter().write("["+key+":"+getTargetLoginTime() + ":"+getTargetLastKeepAlive()+"]\n");
                 		}
                 	}
-                	getOutBufferedWriter().write(FMFOFFICE_CLIENTRESPONSE_END+"\n");  
-                	getOutBufferedWriter().flush();
+                	getOutBufferedWriter().write(FMFOFFICE_CLIENTRESPONSE_END+"\n");  //ClientResponseEnd
+                	getOutBufferedWriter().flush();		//empty everything from the 
                 }
-                else if (command.equals(FMFOFFICE_CLIENTCOMMAND)){
+                else if (command.equals(FMFOFFICE_CLIENTCOMMAND)){	//ClientCmdEnd
                 	connectionType=CLIENT_CONNECTION;
                 	userID = clientPhone;               	
                 	
@@ -251,18 +266,19 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                 	getOutBufferedWriter().newLine();                        
                     getOutBufferedWriter().flush();                                                               	                
                 }
-                else if (command.equals(FMFOFFICE_CLIENTGETSERVERSTATUS)){
+                else if (command.equals(FMFOFFICE_CLIENTGETSERVERSTATUS)){	///////////////////////////////ClientGetServerStatus
                 	connectionType=CLIENT_CONNECTION;
                 	userID = clientPhone;               	
                 	
-                	MainOfficeServer.clientHT.put(clientPhone,this);
+                	MainOfficeServer.clientHT.put(clientPhone,this);	//put client phone into Hashtable of client lis
 
                 	// return Server status
                 	getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_GETSERVERSTATUS+":"+clientPhone+":"+targetPhone+"]\n");
 
+                	//Gets all the Keys of targetInfoListHT, which are phones 
                 	Enumeration<String> enumKey = MainOfficeServer.targetInfoListHT.keys();
                 	while(enumKey.hasMoreElements()) {
-                		String key = enumKey.nextElement();
+                		String key = enumKey.nextElement();		//get 
 
                 		if(key==null || key.length() == 0)
                 		{
@@ -270,12 +286,33 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                 		}
                 		else
                 		{
+                			//get the MainOfficeTargetInfo from the key 
                 			MainOfficeTargetInfo targetInfo = MainOfficeServer.targetInfoListHT.get(key);
                     		if (targetInfo == null)
                     		{
+                    			System.out.println("targetInfo is null");
                     			continue;
                     		}
-                			getOutBufferedWriter().write(targetInfo.getTargetInfo(key));
+//                    		else{
+                    			//Display time in days since the server started running (aka
+                    			//Display # of targets
+	                    		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	                            String serverStartFormatted = dateFormat.format(Tools.getServerStart()); //Ex: 2014/08/06 15:59:48  
+//                    			int year = Tools.getServerStart().get(Calendar.YEAR);
+//                    			int month = Tools.getServerStart().get(Calendar.MONTH);
+//                    			int day_of_month= Tools.getServerStart().get(Calendar.DAY_OF_MONTH);
+//                    			String serverStartFormatted = year + "-" + month + "-" +day_of_month;
+                    			int daysUp = Tools.compareDate(serverStartFormatted);
+                    			debugWrite("DaysUp:" + daysUp + " , Size:" + targetInfo.getNumOfLocations());
+                    			getOutBufferedWriter().write("DaysUp:" + daysUp + " , Size:" + targetInfo.getNumOfLocations());
+                            	getOutBufferedWriter().newLine();                        
+  
+//                    		}
+                			debugWrite("targetInfo: " + targetInfo.getTargetInfo(key));
+//                			System.out.println(targetInfo.getTargetInfo(key));
+                    		getOutBufferedWriter().write(targetInfo.getTargetInfo(key));	
+                			//public String getTargetInfo(String myPhone)
+                			//Write to BufferedWriter in format: myPhone: Last update time:hasLocation : updateTimes: delogTime
                 		}
                 	}            
                 	getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_END+"]");
@@ -286,7 +323,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                 	connectionType=CLIENT_CONNECTION;
                 	userID = clientPhone;               	
                 	
-                	MainOfficeServer.clientHT.put(clientPhone,this);
+                	MainOfficeServer.clientHT.put(clientPhone,this);	
 
                 	// look for remote target.
                 	MainOfficeTargetInfo targetInfo = MainOfficeServer.targetInfoListHT.get(targetPhone);
@@ -335,7 +372,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                     
                     
                 }
-                else if (command.equals(FMFOFFICE_TARGETKEEPALIVE))
+                else if (command.equals(FMFOFFICE_TARGETKEEPALIVE))		//TargetKAlive
                 {
                 	debugWrite("FMFOFFICE_TARGETKEEPALIVE");
                 	connectionType=TARGET_CONNECTION;
@@ -347,7 +384,11 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                     MainOfficeServer.targetHT.put (targetPhone, this);  
                     
                     // Now put this info into LinkedList
+                    //Get the information of the target from targetInfoListHT, which is a Hashtable that 
+                    //	takes a Hashtable <String, MainOfficeTargetInfo>
                     MainOfficeTargetInfo targetInfo = MainOfficeServer.targetInfoListHT.get(targetPhone);
+                    
+                    //If the target doesn't exist in the list, make a new one and add it into the HashTable
                     if (targetInfo == null)
                     {
                     	System.out.println("--- Create new MainOfficeTargetInfo ---");
@@ -355,12 +396,13 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                     	MainOfficeServer.targetInfoListHT.put(targetPhone,targetInfo);
                     }
                   
-                    // Check 
+                    // Get the target's latest location
                     String latestLocString = targetInfo.getLatestLocation();
-
+                    
+                    //If the latest location is null, add retString to it
                     if (latestLocString == null)
                     {
-                    	targetInfo.addLocation(retString);
+                    	targetInfo.addLocation(retString);	
                     }
                     else
                     {
@@ -377,7 +419,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 
                     
 
-                    System.out.println("--- Linked List size: "+targetInfo.getNumOfLocations());
+                    System.out.println("--- Linked List size/ # of locations: "+targetInfo.getNumOfLocations());
                     
                 	getOutBufferedWriter().write("["+FMFOFFICE_TARGETRESPONSE_KEEPALIVE+":"+clientPhone+":"+targetPhone+"]\n");
                 	// put some more commands if necessary
@@ -490,7 +532,9 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
     }
     
     
-
+    /*
+     * Prints out current time in format yyyy-MM-dd HH:mm:ss from the DateFormat object
+     */
     public void debugWrite(String s)
     {
         //char aa = 0x0a;
@@ -525,13 +569,22 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
     public String getTargetLastKeepAlive() { return targetLastKeepAlive;}
     public String getTargetLoginTime() { return targetLoginTime; }   
 
+    /*
+     * Gets the time using a DateFormat object
+     */
     public String getCurrentTime()
     {
     	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
-        return dateFormat.format(date); //2014/08/06 15:59:48  
+        return dateFormat.format(date); //Ex: 2014/08/06 15:59:48  
     }
     
+    /*
+     *  Extract the string from the buffered reader
+     *  String retString = extraStringFromBF(  getInReader(),addCommandBracket(FMFOFFICE_TARGETRESPONSE_END),null ); 
+     *  String retString = extraStringFromBF(  getInReader(),"TargetResponseEnd",null ); 
+     *  TargetResponseEnd 
+     */
     public String extraStringFromBF(
     		BufferedReader bf, String endString, BufferedWriter bw)
     {
@@ -542,16 +595,20 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 		{
 			try 
 			{			
-				String readString = bf.readLine();
+				String readString = bf.readLine();		//read a line from the BufferedReader
 				//System.out.println("extraStringFromBF:Read:"+readString);
 			
-				if (readString == null) break;
+				if (readString == null) break;			//if empty, break
 				//System.out.println("extraStringFromBF:Read 2:"+readString);
 				
-				//System.out.println("extraStringFromBF:Read 3:"+readString);				
-				if (endString != null && endString.length() != 0)
+				//System.out.println("extraStringFromBF:Read 3:"+readString);	
+				
+				
+				if (endString != null && endString.length() != 0)		
 				{
-					//System.out.println("extraStringFromBF:Read 4:"+readString);							
+					//System.out.println("extraStringFromBF:Read 4:"+readString);	
+					
+					//For TargetKeepAlive: if readString = "TargetResponseEnd"
 					if (readString.equals(endString)) 
 					{
 						System.out.println("extraStringFromBF:Read Found End String:"+readString+"\n");
@@ -582,7 +639,9 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 		}    	
 		return returnString;
     }
-    
+    /*
+     * Adds brackets [] to the command
+     */
     public String addCommandBracket(String inString)
     {
     	if (inString != null)
@@ -606,10 +665,15 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
     	return retString;
     }
     
+    /*
+     * Display all clients and targets 
+     */
     public void displayExistingConnections()
     {
-    	String dispString = "Client: Size:"+MainOfficeServer.clientHT.size()+", ->";
+    	System.out.println("Calling displayExistingConnections()");	
+    	String dispString = "Clients: Size:"+MainOfficeServer.clientHT.size()+", ->";
     	
+    	//Display all existing Clients
     	Enumeration<String> enumKey = MainOfficeServer.clientHT.keys();
     	while(enumKey.hasMoreElements()) {
     		String key = enumKey.nextElement();
@@ -617,6 +681,8 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
     	}
     		
     	dispString += "\nTarget: Size:"+MainOfficeServer.targetHT.size()+"\n*****************\n";
+    	
+    	//Display all existing Targets
     	
     	enumKey = MainOfficeServer.targetHT.keys();
     	while(enumKey.hasMoreElements()) {

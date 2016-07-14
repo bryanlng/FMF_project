@@ -5,6 +5,7 @@ import com.wl.fmfServer.data.Tools;
 
 import java.io.*;
 import java.util.logging.*;
+import java.util.Calendar;
 import java.util.Properties;
 import java.util.Hashtable;
 
@@ -19,7 +20,7 @@ public class MainOfficeServer {
 
         FileHandler fh=null;
         Properties prop = new Properties();
-
+        Tools.startServerCalendar();
         //  Open config file  (properties file)
         prop = Tools.getProperties(Tools.MAINOFFICE_PROPERTIES_FILE);
 
@@ -57,17 +58,17 @@ public class MainOfficeServer {
 
       //  Thread secComm = new MainOfficeCommServer(true,ipPort);
       //  Thread unsecComm = new MainOfficeCommServer(false,ipPort+1);
-        Thread unsecComm = new MainOfficeCommServer(false,ipPort);
+        Thread unsecComm = new MainOfficeCommServer(false,ipPort);		//ended up only implementing unsecured one, as secured one would require creating an SSL certificate
        // secComm.start();
         unsecComm.start();
    }
 
   // public static LinkedList<String> TargetHistoryList = new LinkedList<String>();
 
-   // Target List
+   // Target List. From the FindMyPhone. Target = cellphones
    public static Hashtable <String, MainOfficeHandler> targetHT = new Hashtable<String, MainOfficeHandler>();
 
-   // Client List
+   // Client List. From FindMyFamily. 
    public static Hashtable <String, MainOfficeHandler> clientHT = new Hashtable<String, MainOfficeHandler>();
 
    // Target Info List

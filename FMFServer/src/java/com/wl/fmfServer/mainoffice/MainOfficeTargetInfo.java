@@ -24,7 +24,7 @@ public class MainOfficeTargetInfo {
     
     public void addLocation(String location)
     {
-        // update lated time;
+        // update latest time;
     	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
         latestLocationUpdateTime = dateFormat.format(date); //2014-08-22 15:59:48  
@@ -133,6 +133,9 @@ public class MainOfficeTargetInfo {
     	return debugLogTime;
     }
 
+    public int numOfTargets(){
+    	return targetLocationList.size();
+    }
 
 
 }
