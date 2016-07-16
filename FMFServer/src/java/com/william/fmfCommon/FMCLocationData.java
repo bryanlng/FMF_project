@@ -7,7 +7,7 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class FMPLocationData{
+public class FMCLocationData{
     /*
      * 
      * The following is the locationData in String format
@@ -79,7 +79,7 @@ public class FMPLocationData{
 //  public static int LOCATION_PASSIVE=2;
     public static final int NO_OF_LOCATIONS=2;
 
-    public FMPLocationData()
+    public FMCLocationData()
     {
 
     }
@@ -194,27 +194,11 @@ public class FMPLocationData{
         return messagesToSend;
     }
 
-    /*
-     * Used to compose Object from incoming message
-     * Sample retString:
-     * [FMPRSP:0 0]
-		PH:
-		DE:
-		BA:99
-		CH:AC
-		MD:OFF
-		GP:ON
-		NW:ON
-		TK:OFF
-		LOC:1 <gps 2015/10/16 07:14:27 33.0738 -96.7236 8 237 2 0>
-		LOC:2 <network 2015/10/16 07:14:25 33.0740 -96.7235 24 0 0>
-		WF:ENC <<Yeah5>>
-     */
+    //  Used to compose Object  from incoming message
     public synchronized boolean composeObjectFromMessage(String inputString, String phoneNumber)
     {
         System.out.println("Ready to composeMessageFromString");
 
-        //If phoneNumber is valid, make our private variable phoneNumber to be the string parameter
         if (phoneNumber != null && phoneNumber.length() != 0)
         {
             this.phoneNumber = phoneNumber;
@@ -227,40 +211,38 @@ public class FMPLocationData{
 
 
         try {
-            // first time. Find array size
             if (messagesReceived==null||messagesReceived.length==0)
             {
-                // [FMPRSP:0 0]
+                // first time. Find array size
+                // [FMPRSP:1 9]
                 int fmpIndex = inputString.indexOf(" ");
                 int closeB = inputString.indexOf("]", fmpIndex);
-                int size = Integer.parseInt(inputString.substring(fmpIndex+1, closeB)) + 1;	//Get the 2nd number of [FMPRSP:0 0] in inputString, which is actually retString
-                messagesReceived = new String[size];	//make messagesRecieved by the size of that array
+                int size = Integer.parseInt(inputString.substring(fmpIndex+1, closeB)) + 1;
+                messagesReceived = new String[size];
                 System.out.println("New Size is "+size);
             }
             System.out.println("*****************************");
             System.out.println("Input String is now:"+inputString+"\nSize is "+messagesReceived.length);
             System.out.println("*****************************");
  
-            //Get the 1st number of [FMPRSP:0 0] in inputString, which is actually retString
             int msgIndex = Integer.parseInt(inputString.substring(inputString.indexOf(":")+1, inputString.indexOf(" ")));
             
-            messagesReceived[msgIndex]=inputString;		//put inputString into messagedRecieved[first number]
+            messagesReceived[msgIndex]=inputString;
 
-            // Now check if all the messages arrived by parsing through the entire messagesReceived string array
+            // Now check if all the messages arrived
 
             String fullMessage = "";
             for (int i=0;i<messagesReceived.length;i++)
             {
-                if (messagesReceived[i]==null)	//if message isn't there, messageDecodeCompleted=false;
+                if (messagesReceived[i]==null)
                 {
                     // message not completed
                     messageDecodeCompleted=false;
-                    System.out.println("Msg not completed yet");
+                    System.out.println("Msg not complted yet");
                     return true;
                 }
-                else	//if message is there, then add it onto fullMessage
+                else
                 {
-                	//HEADER = "FMPRSP"
                     fullMessage +=messagesReceived[i].substring(HEADER.length()+7);
                 }
             }
@@ -284,119 +266,104 @@ public class FMPLocationData{
     public static String MSGTAG_WIFI="WF:";
                  *
              */
-            //Split the fullmessage by \n and \r ==> put inside of an array of Strings
-            String lines[] = fullMessage.split("\\r?\\n");	
+            String lines[] = fullMessage.split("\\r?\\n");
             System.out.println("Found number of lines:"+lines.length);
-            
-            //Parse through each String, check if it's "PH:", "DE:", etc
             for (int i=0;i<lines.length;i++)
             {
-                if (lines[i].contains(MSGTAG_PHONENO) && phoneNumber == null)	//"PH:", length = 3. Extract number
+                if (lines[i].contains(MSGTAG_PHONENO) && phoneNumber == null)
                 {
                     this.setPhoneNumber( lines[i].substring(MSGTAG_PHONENO.length() )) ;
                 }
-                else if (lines[i].contains(MSGTAG_DATE))						//"DE:", length = 3, Extract date
+                else if (lines[i].contains(MSGTAG_DATE))
                 {
                     this.setUpdateDateString( lines[i].substring(MSGTAG_DATE.length() )) ;
                 }
-                else if (lines[i].contains(MSGTAG_BATTERY))						//"BA:", length = 3
+                else if (lines[i].contains(MSGTAG_BATTERY))
                 {
                     int bLevel;
                     try {
                         bLevel = Integer.parseInt(lines[i].substring(MSGTAG_BATTERY.length()));
                         this.setBatteryLevel(bLevel);
                     }
-                    catch (NumberFormatException e){	//no battery left
+                    catch (NumberFormatException e){
                         this.setBatteryLevel(-1);
                     }
                 }
-                else if (lines[i].contains(MSGTAG_CHARGE))						//"CH:", length = 3	
+                else if (lines[i].contains(MSGTAG_CHARGE))
                 {
                     this.setChargingMethod(lines[i].substring(MSGTAG_CHARGE.length()));
                 }
-                else if (lines[i].contains(MSGTAG_MODATA))						//"MD:", length = 3
+                else if (lines[i].contains(MSGTAG_MODATA))
                 {
                     this.setMobileDataON(lines[i].contains("ON"));
                 }
-                else if (lines[i].contains(MSGTAG_GPS))							//"GP:", length = 3
+                else if (lines[i].contains(MSGTAG_GPS))
                 {
                     this.setGPSON(lines[i].contains("ON"));
                 }
-                else if (lines[i].contains(MSGTAG_NETWORK))						//"NW:", length = 3
+                else if (lines[i].contains(MSGTAG_NETWORK))
                 {
                     this.setNetworkON(lines[i].contains("ON"));
                 }
-                else if (lines[i].contains(MSGTAG_TRACK))						//"TK:", length = 3		
+                else if (lines[i].contains(MSGTAG_TRACK))
                 {
                     this.setTrackON(lines[i].contains("ON"));
                 }
-                else if (lines[i].contains(MSGTAG_INTERACTIVE))					//"IN:", length = 3
+                else if (lines[i].contains(MSGTAG_INTERACTIVE))
                 {
                     this.setInteractiveON(lines[i].contains("ON"));
                 }
-                else if (lines[i].contains(MSGTAG_LOCATION))					//"LOC:", length = 4
+                else if (lines[i].contains(MSGTAG_LOCATION))
                 {
                 // * LOC:1 <network 2014/01/20 17:33:22 32.9759 -96.7204 1210>
                 	FMCRawLocation location = new FMCRawLocation();
-                	//extract the "network 2014/01/20 17:33:22 32.9759 -96.7204 1210" part out
                     String locationString = lines[i].substring(lines[i].indexOf("<")+1,lines[i].indexOf(">"));
 
                 	location.convertFromStringToObject(locationString);                	
                 	
-                	System.out.println("My location is "+location.getProvider());	//either "network" or "gps"
-                    if (location.getProvider().equalsIgnoreCase(FMCRawLocation.LOCATION_GPS_STRING)){	//LOCATION_GPS_STRING = gps
-                        fMPLocations[LOCATION_GPS] = location; //fMPLocations[0] = location; Add location into fMPLocations[0]
+                	System.out.println("My location is "+location.getProvider());
+                    if (location.getProvider().equalsIgnoreCase(FMCRawLocation.LOCATION_GPS_STRING)){
+                        fMPLocations[LOCATION_GPS] = location;
                     }
-                    else if (location.getProvider().equalsIgnoreCase(FMCRawLocation.LOCATION_NETWORK_STRING)){//LOCATION_NETWORK_STRING = network
-                        fMPLocations[LOCATION_NETWORK] = location;	// //fMPLocations[1] = location; Add location into fMPLocations[1]
+                    else if (location.getProvider().equalsIgnoreCase(FMCRawLocation.LOCATION_NETWORK_STRING)){
+                        fMPLocations[LOCATION_NETWORK] = location;
                     }
 
                 }
-                else if (lines[i].contains(MSGTAG_WIFI)) {						//"WF:", length = 3
+                else if (lines[i].contains(MSGTAG_WIFI)) {
                 //* WF:ENC <<Yeah5>> or WF:DIS or WF:ENG or WF:ENN <ATT88,ADF,WWFWE>
-                    setWifiStatus(lines[i].substring(lines[i].indexOf(":")+1, lines[i].indexOf(":")+4));	//set wifi status to be the word after "WF:". Ex: "ENC"
+                    setWifiStatus(lines[i].substring(lines[i].indexOf(":")+1, lines[i].indexOf(":")+4));
                     if (lines[i].contains("<<"))
                     {
                         this.connectedWifiSSID = lines[i].substring(lines[i].indexOf("<<")+2, lines[i].indexOf(">>"));
-                        //Wifi SSID = wife name
-                        //Ex: connectedWifiSSID = Yeah5
-                        
                     }
                     else if (lines[i].contains("<"))
                     {
                         String a = lines[i].substring(lines[i].indexOf("<")+1, lines[i].indexOf(">"));
                         this.wifiAvailableSSIDs = a.split(",");
-                        //Wifi SSID = wife name
-                        //Ex: Puts ATT88,ADF,WWFWE ==> String array of available WIFIs
                     }
 
                 }
             }
 
             // Decide Best Location
-           //if only network location is available ==> get the network location
-            if (fMPLocations[LOCATION_GPS]==null && fMPLocations[LOCATION_NETWORK]!=null)	//if only network location is available ==> get 
+            if (fMPLocations[LOCATION_GPS]==null && fMPLocations[LOCATION_NETWORK]!=null)
             {
-                bestLocation = fMPLocations[LOCATION_NETWORK];	//LOCATION_NETWORK = 1
+                bestLocation = fMPLocations[LOCATION_NETWORK];
             }
-           //if only gps location is available ==> get the gps location 
             else if (fMPLocations[LOCATION_GPS]!=null && fMPLocations[LOCATION_NETWORK]==null)
             {
-                bestLocation = fMPLocations[LOCATION_GPS];		//LOCATION_GPS= 0
+                bestLocation = fMPLocations[LOCATION_GPS];
             }
-            //if both gps and network locations are available, choose the best one
             else if (fMPLocations[LOCATION_GPS]!=null && fMPLocations[LOCATION_NETWORK]!=null)
             {
                 // Both are not null
                 // Check time
-                bestLocation = fMPLocations[LOCATION_GPS];	//By default, make the best location from GPS
-                //find time difference (in milliseconds) between GPS and network 
+                bestLocation = fMPLocations[LOCATION_GPS];
                 long delta  = fMPLocations[LOCATION_NETWORK].getTime() - fMPLocations[LOCATION_GPS].getTime();
-                
-                //if within 10 second difference, compare accuracy. Accuracy = accuracy to x feet, thus smaller = better
+
                 if (Math.abs(delta) < 10000) {
                     // within 10 sec
-                	//If network accuracy < gps accuracy ==> use network accuracy
                     if (fMPLocations[LOCATION_NETWORK].getAccuracy() < fMPLocations[LOCATION_GPS].getAccuracy())
                     {
                         bestLocation = fMPLocations[LOCATION_NETWORK];
@@ -601,7 +568,7 @@ public class FMPLocationData{
 
     public boolean equals(Object o)
     {
-        FMPLocationData other = (FMPLocationData)o;
+        FMCLocationData other = (FMCLocationData)o;
         System.out.println("Comparing local:"+this.phoneNumber+" and "+ other.phoneNumber + ", should rtn:"+(this.phoneNumber.equals(other.phoneNumber)));
 
         return (this.phoneNumber.equals(other.phoneNumber));

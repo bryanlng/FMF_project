@@ -31,24 +31,24 @@ public class FMCRawLocation {
 	
 	public boolean convertFromStringToObject(String locationString)
 	{
-       //Sample locationString: "network 2014/01/20 17:33:22 32.9759 -96.7204 1210 21 22"
+        // network 2014/01/20 17:33:22 32.9759 -96.7204 1210 21 22
        // String a = locationString.substring(locationString.indexOf("<")+1,locationString.indexOf(">"));
-        String[] result = locationString.split(" "); //remove spaces ==> put into String array 
+        String[] result = locationString.split(" ");
         System.out.println("location has elmements:"+result.length);
-        setProvider(result[0]);	//set provider to be "network"
+        setProvider(result[0]);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
 
         try {
-        	java.util.Date date = sdf.parse(new String(result[1]+" "+result[2]));	//attempt to convert "2014/01/20 17:33:22" into a Date object
-            setTime(date.getTime());		//if successful, change time to be the time of the Date object 
+        	java.util.Date date = sdf.parse(result[1]+" "+result[2]);
+            setTime(date.getTime());
         }
         catch (Exception e) {
-        	
+            setTime(0);
         }
         
-        setLatitude (Double.parseDouble(result[3]));	//set latitude = 32.9759
-        setLongitude(Double.parseDouble(result[4]));	//set longitude = -96.7204
-        setAccuracy(Float.parseFloat(result[5]));		//set accuracy = 1210
+        setLatitude (Double.parseDouble(result[3]));
+        setLongitude(Double.parseDouble(result[4]));
+        setAccuracy(Float.parseFloat(result[5]));
         if (result.length>=8)
         {
             setBearing(Float.parseFloat(result[6]));

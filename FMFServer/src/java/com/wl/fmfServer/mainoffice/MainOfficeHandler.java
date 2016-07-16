@@ -1,7 +1,8 @@
 package com.wl.fmfServer.mainoffice;
 
 import com.william.fmfCommon.FMCRawLocation;
-import com.william.fmfCommon.FMPLocationData;
+import com.william.fmfCommon.FMCLocationData;
+import com.william.fmfCommon.FMCMessage;
 import com.wl.fmfServer.data.TcpDataCommunication;
 import com.wl.fmfServer.data.Tools;
 
@@ -9,10 +10,8 @@ import java.io.*;
 import java.net.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Hashtable;
 
 import javax.net.ssl.SSLSocket;
 
@@ -24,50 +23,6 @@ This will be used by both target connection and client connection
 public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 {
 	
-
-	// Starts - Copy these to FMF and FMP
-    //Client Commands. Client = from FindMyFamily. Client --> Server
-    public static String FMFOFFICE_CLIENTLISTALL = "ClientListAll";
-    public static String FMFOFFICE_CLIENTCOMMAND = "ClientCommand";
-    public static String FMFOFFICE_CLIENTGETLATEST = "ClientGetLatest";    
-    public static String FMFOFFICE_CLIENTGETALLHISTORY = "ClientGetAllHistory";
-    public static String FMFOFFICE_CLIENTGETSERVERSTATUS = "ClientGetServerStatus";    
-    public static String FMFOFFICE_CLIENTGETLOG = "ClientGetLog";        
-    public static String FMFOFFICE_CLIENTCOMMAND_END = "ClientCmdEnd";
-    //Client Responses
-    public static String FMFOFFICE_CLIENTRESPONSE_LISTALL = "ClientListAllResponse";
-    public static String FMFOFFICE_CLIENTRESPONSE_GETLATEST = "ClientGetLatestResponse";  
-    public static String FMFOFFICE_CLIENTRESPONSE_GETALLHIST = "ClientGetAllHistResponse"; 
-    public static String FMFOFFICE_CLIENTRESPONSE_GETSERVERSTATUS = "ClientGetServerStatusResponse";
-    public static String FMFOFFICE_CLIENTRESPONSE_GETLOG = "ClientGetLogResponse";            
-    public static String FMFOFFICE_CLIENTRESPONSE_END = "ClientResponseEnd";    
-    public static String FMFOFFICE_CLIENTRESPONSE_OK = "ClientRspOk";
-    public static String FMFOFFICE_CLIENTRESPONSE_ERR = "ClientRspErr";
-    public static String FMFOFFICE_CLIENTRESPONSE_NOTARGET = "ClientRspNoTarget";
-    public static String FMFOFFICE_CLIENTRESPONSE_SEPERATOR = "ClientRspSeperator";    
-
-    //[TargetLogin: :9876543210]
-
-    //[TargetKAlive: :9876543210] or [TargetTrack: :9876543210]
-    //[FMPRSP:0 0]\nPH:\nDE:\nBA:80\nMD:ON\nGP:ON\nNW:ON\nTK:ON\nLOC:1 <gps 2015/01/19 15:53:19 33.0742 -96.7237 76 0 0 9>\nLOC:2 <network 2015/01/19 15:55:15 33.0687 -96.7122 1261 0 0>\nWF:ENC
-    //[TargetResponseEnd]
-
-    //[TargetResponseBegin:1234567890:9876543210]
-    //[FMPRSP:0 0]\nPH:\nDE:\nBA:80\nMD:ON\nGP:ON\nNW:ON\nTK:ON\nLOC:1 <gps 2015/01/19 15:53:19 33.0742 -96.7237 76 0 0 9>\nLOC:2 <network 2015/01/19 15:55:15 33.0687 -96.7122 1261 0 0>\nWF:ENC
-    //[TargetResponseEnd]
-    
-    //Target = From cellphones FindMyPhone. Target --> Server
-    public static String FMFOFFICE_TARGETLOGIN = "TargetLogin";
-    public static String FMFOFFICE_TARGETKEEPALIVE = "TargetKAlive";
-    public static String FMFOFFICE_TARGETLOG = "TargetLog";    
-    public static String FMFOFFICE_TARGETRESPONSE_BEGIN = "TargetResponseBegin";
-    public static String FMFOFFICE_TARGETRESPONSE_END = "TargetResponseEnd";
-    public static String FMFOFFICE_TARGETRESPONSE_LOGIN     = "TargetRspLogin";
-    public static String FMFOFFICE_TARGETRESPONSE_KEEPALIVE = "TargetRspKAlive";        
-    public static String FMFOFFICE_TARGETTRACK = "TargetTrack";
-    
-	// Ends - Copy these to FMF and FMP
-
     private final int TARGET_CONNECTION=0;
     private final int CLIENT_CONNECTION=1;
     private final int DEBUG_CONNECTION=2;
@@ -145,11 +100,11 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                 
                 /************************Based on the command, do something different*******************************/
                 
-                if (command.equals(FMFOFFICE_CLIENTLISTALL)){	//If command = "ClientListAll"
+                if (command.equals(FMCMessage.FMFOFFICE_CLIENTLISTALL)){	//If command = "ClientListAll"
                 		
                 	//getOutBufferedWriter() simply returns the BufferedWriter we got in setBuilders()
                 	//write "ClientListAllResponse" to the BufferedWriter
-                	getOutBufferedWriter().write(FMFOFFICE_CLIENTRESPONSE_LISTALL+"\n");	//ClientListAllResponse
+                	getOutBufferedWriter().write(FMCMessage.FMFOFFICE_CLIENTRESPONSE_LISTALL+"\n");	//ClientListAllResponse
 
                 	//gets list of all the keys in targetHT, the target list
                 	//Aka, gets all the targets and put them in an Enumeration<String>
@@ -175,10 +130,10 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                 			getOutBufferedWriter().write("["+key+":"+getTargetLoginTime() + ":"+getTargetLastKeepAlive()+"]\n");
                 		}
                 	}
-                	getOutBufferedWriter().write(FMFOFFICE_CLIENTRESPONSE_END+"\n");  //ClientResponseEnd
+                	getOutBufferedWriter().write(FMCMessage.FMFOFFICE_CLIENTRESPONSE_END+"\n");  //ClientResponseEnd
                 	getOutBufferedWriter().flush();		//empty everything from the 
                 }
-                else if (command.equals(FMFOFFICE_CLIENTCOMMAND)){	//ClientCmdEnd
+                else if (command.equals(FMCMessage.FMFOFFICE_CLIENTCOMMAND)){	//ClientCmdEnd
                 	connectionType=CLIENT_CONNECTION;
                 	userID = clientPhone;               	
                 	
@@ -195,7 +150,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                 	
                 	if (targetHandler != null) {
                     	debugWrite("FMFOFFICE_CLIENTCOMMAND. Target exist:");
-                    	getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_OK+":"+clientPhone+":"+targetPhone+"]");
+                    	getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_OK+":"+clientPhone+":"+targetPhone+"]");
                         getOutBufferedWriter().newLine();
                         getOutBufferedWriter().flush();     
                         
@@ -204,7 +159,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                         remoteBufferedWriter.write(readString+"\n");
                         
                         String retString = extraStringFromBF(
-                        		getInReader(),addCommandBracket(FMFOFFICE_CLIENTCOMMAND_END),remoteBufferedWriter );
+                        		getInReader(),addCommandBracket(FMCMessage.FMFOFFICE_CLIENTCOMMAND_END),remoteBufferedWriter );
 
                         remoteBufferedWriter.flush();   
                 	}
@@ -214,15 +169,15 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                     	
                     	// readalllines
                         String retString = extraStringFromBF(
-                        		getInReader(),addCommandBracket(FMFOFFICE_CLIENTCOMMAND_END),null );
+                        		getInReader(),addCommandBracket(FMCMessage.FMFOFFICE_CLIENTCOMMAND_END),null );
                         
                         // REsponse with error
-                    	getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_NOTARGET+":"+clientPhone+":"+targetPhone+"]");
+                    	getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_NOTARGET+":"+clientPhone+":"+targetPhone+"]");
                         getOutBufferedWriter().newLine();
                         getOutBufferedWriter().flush();                  		                	    		
                 	}           	                	                
                 }
-                else if (command.equals(FMFOFFICE_CLIENTGETLATEST)){
+                else if (command.equals(FMCMessage.FMFOFFICE_CLIENTGETLATEST)){
                 	connectionType=CLIENT_CONNECTION;
                 	userID = clientPhone;               	
                 	
@@ -234,18 +189,18 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                     {
                     	debugWrite("FMFOFFICE_CLIENTGETLATEST Found MainOfficeTargetInfo:");
                     	String retString = targetInfo.getLatestLocation(); 
-                    	getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_GETLATEST+":"+clientPhone+":"+targetPhone+"]\n");
+                    	getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_GETLATEST+":"+clientPhone+":"+targetPhone+"]\n");
                     	getOutBufferedWriter().write(retString+"\n");
-                    	getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_END+"]");                    	                    	               	
+                    	getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_END+"]");                    	                    	               	
                     }
                     else
                     {
-                    	getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_NOTARGET+":"+clientPhone+":"+targetPhone+"]");                    	
+                    	getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_NOTARGET+":"+clientPhone+":"+targetPhone+"]");                    	
                     }
                 	getOutBufferedWriter().newLine();                        
                     getOutBufferedWriter().flush();                                                               	                
                 }                
-                else if (command.equals(FMFOFFICE_CLIENTGETALLHISTORY)){
+                else if (command.equals(FMCMessage.FMFOFFICE_CLIENTGETALLHISTORY)){
                 	connectionType=CLIENT_CONNECTION;
                 	userID = clientPhone;               	
                 	
@@ -256,26 +211,26 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                     if (targetInfo != null)
                     {
                     	debugWrite("FMFOFFICE_CLIENTGETLATEST Found lindedlist:"+targetInfo.getNumOfLocations());
-                    	getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_GETLATEST+":"+clientPhone+":"+targetPhone+"]\n");
-                    	String locations = targetInfo.getAllLocations("["+FMFOFFICE_CLIENTRESPONSE_SEPERATOR+"]");
+                    	getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_GETLATEST+":"+clientPhone+":"+targetPhone+"]\n");
+                    	String locations = targetInfo.getAllLocations("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_SEPERATOR+"]");
             	        getOutBufferedWriter().write(locations);
-            	        getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_END+"]");
+            	        getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_END+"]");
                     }
                     else
                     {
-                    	getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_NOTARGET+":"+clientPhone+":"+targetPhone+"]");                    	
+                    	getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_NOTARGET+":"+clientPhone+":"+targetPhone+"]");                    	
                     }
                 	getOutBufferedWriter().newLine();                        
                     getOutBufferedWriter().flush();                                                               	                
                 }
-                else if (command.equals(FMFOFFICE_CLIENTGETSERVERSTATUS)){	///////////////////////////////ClientGetServerStatus
+                else if (command.equals(FMCMessage.FMFOFFICE_CLIENTGETSERVERSTATUS)){	///////////////////////////////ClientGetServerStatus
                 	connectionType=CLIENT_CONNECTION;
                 	userID = clientPhone;               	
                 	
                 	MainOfficeServer.clientHT.put(clientPhone,this);	//put client phone into Hashtable of client phones that have FMP
 
                 	// return Server status
-                	getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_GETSERVERSTATUS+":"+clientPhone+":"+targetPhone+"]\n");
+                	getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_GETSERVERSTATUS+":"+clientPhone+":"+targetPhone+"]\n");
 
                 	//Gets all the phones of targetInfoListHT (phones)
                 	Enumeration<String> enumKey = MainOfficeServer.targetInfoListHT.keys();
@@ -318,11 +273,11 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                 			//Write to BufferedWriter in format: myPhone: Last update time:hasLocation : updateTimes: delogTime
                 		}
                 	}            
-                	getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_END+"]");
+                	getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_END+"]");
                 	getOutBufferedWriter().newLine();                        
                     getOutBufferedWriter().flush();                                              	                
                 }                
-                else if (command.equals(FMFOFFICE_CLIENTGETLOG)){
+                else if (command.equals(FMCMessage.FMFOFFICE_CLIENTGETLOG)){
                 	connectionType=CLIENT_CONNECTION;
                 	userID = clientPhone;               	
                 	
@@ -333,13 +288,13 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                     if (targetInfo != null)
                     {
                     	debugWrite("FMFOFFICE_CLIENTGETLOG Found targetInfo:"+targetInfo.getDebugLogtime());
-                    	getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_GETLOG+":"+clientPhone+":"+targetPhone+"]\n");
+                    	getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_GETLOG+":"+clientPhone+":"+targetPhone+"]\n");
             	        getOutBufferedWriter().write(targetInfo.getDebugLogtime()+"\n"+targetInfo.getDebugLog()+"\n");
-            	        getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_END+"]");
+            	        getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_END+"]");
                     }
                     else
                     {
-                    	getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_NOTARGET+":"+clientPhone+":"+targetPhone+"]");                    	
+                    	getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_NOTARGET+":"+clientPhone+":"+targetPhone+"]");                    	
                     }
                 	getOutBufferedWriter().newLine();                        
                     getOutBufferedWriter().flush();                                             	                
@@ -351,7 +306,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                 
                 //  From Target below
                 
-                else if (command.equals(FMFOFFICE_TARGETLOGIN)){
+                else if (command.equals(FMCMessage.FMFOFFICE_TARGETLOGIN)){
                 	debugWrite("FMFOFFICE_TARGETLOGINd:");
                 	userID = targetPhone;
                 	connectionType=TARGET_CONNECTION;
@@ -368,26 +323,26 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                     MainOfficeServer.targetHT.put (targetPhone, this);    
                     debugWrite("FMFOFFICE_TARGETLOGIN finished:");                            
                     
-                	getOutBufferedWriter().write("["+FMFOFFICE_TARGETRESPONSE_LOGIN+":"+clientPhone+":"+targetPhone+"]\n");
-        	        getOutBufferedWriter().write("["+FMFOFFICE_TARGETRESPONSE_END+"]\n");
+                	getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_TARGETRESPONSE_LOGIN+":"+clientPhone+":"+targetPhone+"]\n");
+        	        getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_TARGETRESPONSE_END+"]\n");
                     getOutBufferedWriter().flush();                                             	                
         	        
                     
                     
                 }
-                else if (command.equals(FMFOFFICE_TARGETKEEPALIVE))		//TargetKAlive
+                else if (command.equals(FMCMessage.FMFOFFICE_TARGETKEEPALIVE))		//TargetKAlive
                 {
                 	debugWrite("FMFOFFICE_TARGETKEEPALIVE");
                 	connectionType=TARGET_CONNECTION;
                 	targetLastKeepAlive = getCurrentTime();
                 	userID = targetPhone;          
                     String retString = extraStringFromBF(
-                    		getInReader(),addCommandBracket(FMFOFFICE_TARGETRESPONSE_END),null );
+                    		getInReader(),addCommandBracket(FMCMessage.FMFOFFICE_TARGETRESPONSE_END),null );
                     System.out.println("retString is the extracted String: " + retString);
                     
                     // Convert String to a FMPLocationData Objcted String:->"+retString+"<-");
                     System.out.println("targetPhone: " + targetPhone);
-                    FMPLocationData locationData = new FMPLocationData();
+                    FMCLocationData locationData = new FMCLocationData();
                     locationData.composeObjectFromMessage(retString, targetPhone);	//fill the FMPLocationData object with info from retString
                     System.out.println("Converted this record:"+locationData.getPhoneNumber()+" to Object printout:->"+locationData+"<-");
                     
@@ -432,25 +387,25 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 
                     System.out.println("--- Linked List size/ # of locations: "+targetInfo.getNumOfLocations());
                     
-                	getOutBufferedWriter().write("["+FMFOFFICE_TARGETRESPONSE_KEEPALIVE+":"+clientPhone+":"+targetPhone+"]\n");
+                	getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_TARGETRESPONSE_KEEPALIVE+":"+clientPhone+":"+targetPhone+"]\n");
                 	// put some more commands if necessary
                 	// e.g change keepalive interval
                 	//     request to send log
                 	//     
-        	        getOutBufferedWriter().write("["+FMFOFFICE_TARGETRESPONSE_END+"]\n");
+        	        getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_TARGETRESPONSE_END+"]\n");
                     getOutBufferedWriter().flush();                                             	                                                 
                    
                     // Write to DB
                     
                 }
-                else if (command.equals(FMFOFFICE_TARGETLOG))
+                else if (command.equals(FMCMessage.FMFOFFICE_TARGETLOG))
                 {
                 	debugWrite("FMFOFFICE_TARGETLOG");
                 	connectionType=TARGET_CONNECTION;
                 	targetLastKeepAlive = getCurrentTime();
                 	userID = targetPhone;          
                     String retString = extraStringFromBF(
-                    		getInReader(),addCommandBracket(FMFOFFICE_TARGETRESPONSE_END),null );
+                    		getInReader(),addCommandBracket(FMCMessage.FMFOFFICE_TARGETRESPONSE_END),null );
                     System.out.println("Extracted String:->"+retString+"<-");
                     MainOfficeServer.targetHT.put (targetPhone, this);  
                     
@@ -468,27 +423,29 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                     System.out.println("FMFOFFICE_TARGETLOG logupdated, size: "+targetInfo.getDebugLog().length());                    
                     
                 }                
-                else if (command.equals(FMFOFFICE_TARGETTRACK))
+                /*  not implemented
+                else if (command.equals(FMCMessage.FMFOFFICE_TARGETTRACK))
                 {
                 	debugWrite("FMFOFFICE_TARGETTRACK");
                 	connectionType=TARGET_CONNECTION;
                 	targetLastKeepAlive = getCurrentTime();
                 	userID = targetPhone;          
                     String retString = extraStringFromBF(
-                    		getInReader(),addCommandBracket(FMFOFFICE_TARGETRESPONSE_END),null );
+                    		getInReader(),addCommandBracket(FMCMessage.FMFOFFICE_TARGETRESPONSE_END),null );
                     System.out.println("Extracted String:->"+retString+"<-");
                     
                     // Write to DB for Tracking
                     
-                }   
-                else if (command.equals(FMFOFFICE_TARGETRESPONSE_BEGIN))
+                } 
+                */  
+                else if (command.equals(FMCMessage.FMFOFFICE_TARGETRESPONSE_BEGIN))
                 {
                 	debugWrite("FMFOFFICE_TARGETRESPONSE_BEGIN");
                 	connectionType=TARGET_CONNECTION;
                 	targetLastKeepAlive = getCurrentTime();
                 	userID = targetPhone;          
                     String retString = extraStringFromBF(
-                    		getInReader(),addCommandBracket(FMFOFFICE_TARGETRESPONSE_END),remoteBufferedWriter );
+                    		getInReader(),addCommandBracket(FMCMessage.FMFOFFICE_TARGETRESPONSE_END),remoteBufferedWriter );
                     remoteBufferedWriter.flush();
                     System.out.println("Extracted String:->"+retString+"<-");
                     
@@ -500,7 +457,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                 	debugWrite("unrecgnozied command:"+command);
                 	if (connectionType == CLIENT_CONNECTION)
                 	{             		
-                		getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_ERR+":"+clientPhone+":"+targetPhone+"]");                	
+                		getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_ERR+":"+clientPhone+":"+targetPhone+"]");                	
                         getOutBufferedWriter().newLine();
                         getOutBufferedWriter().flush();
                 	}
