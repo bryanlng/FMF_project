@@ -272,7 +272,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                 	connectionType=CLIENT_CONNECTION;
                 	userID = clientPhone;               	
                 	
-                	MainOfficeServer.clientHT.put(clientPhone,this);	//put client phone into Hashtable of client lis
+                	MainOfficeServer.clientHT.put(clientPhone,this);	//put client phone into Hashtable of client phones that have FMP
 
                 	// return Server status
                 	getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_GETSERVERSTATUS+":"+clientPhone+":"+targetPhone+"]\n");
@@ -383,12 +383,12 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                 	userID = targetPhone;          
                     String retString = extraStringFromBF(
                     		getInReader(),addCommandBracket(FMFOFFICE_TARGETRESPONSE_END),null );
-                    System.out.println("retString is the Extracted String:->"+retString+"<-");
-                    System.out.println("targetPhone: " + targetPhone);
+                    System.out.println("retString is the extracted String: " + retString);
                     
-                    // Convert String to a FMPLocationData Object
+                    // Convert String to a FMPLocationData Objcted String:->"+retString+"<-");
+                    System.out.println("targetPhone: " + targetPhone);
                     FMPLocationData locationData = new FMPLocationData();
-                    locationData.composeObjectFromMessage(retString, targetPhone);
+                    locationData.composeObjectFromMessage(retString, targetPhone);	//fill the FMPLocationData object with info from retString
                     System.out.println("Converted this record:"+locationData.getPhoneNumber()+" to Object printout:->"+locationData+"<-");
                     
                     
