@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--
+    <string name="app_name">FindMyFamily</string>
+-->
+    <string name="action_settings">My Settings (TBD)</string>
+    <string name="title_activity_fmfmain_screen">FMFMainScreen</string>
+  
+
+    
+ 	<!-- Marker Dialog Strings  -->
+	<string name="C_Command">Commands</string>	
+    
+	<!-- Main  Screen Strings -->
+    <string name="C_Add">Add</string>
+    <string name="C_Find">Quick Find</string>
+    <string name="C_MapMode">Map Option</string>
+    <string name="C_Advanced">Tools</string>
+    <string name="C_Header">Control Item List</string>
+    <string name="C_Image">Running</string>   
+    
+	<!-- Find Users Strings  -->	
+	<string name="C_FindMainText">Find Users</string>	
+	<string name="C_SendToAll">Send to All</string>	
+	<string name="C_CommandsMainText">Send Commands</string>			
+	<string name="C_WIFI">Wifi</string>	
+	<string name="C_GPS">GPS</string>	
+	<string name="C_MDATA">Mobile Data</string>		
+	<string name="C_TRACK">Track</string>				
+	<string name="C_ON">On</string>	
+	<string name="C_OFF">Off</string>	
+				
+	<!-- Users Operation Strings  -->	
+    <string name="C_UserMainText">Users Menu</string>
+    <string name="C_Users">Users</string>
+    <string name="C_AddUser">Add User</string>    
+    	       
+	<!-- Send Commands Dialog -->    
+    <string name="C_SendCommand">Send Command</string>
+    <string name="C_Cancel">Cancel</string>    
+    <string name="C_OK">OK</string>  
+    <string name="C_DISMISS">Dismiss</string>     
+    <string name="C_FINDUSER">Find Again</string>   
+    <string name="C_FINDALLUSERS">Find All</string>   
+    <string name="C_DISPLAYALL">Display All</string>  
+    <string name="C_CLEARMAP">Clear Map</string>    
+    
+	<!-- Tools Function Strings  -->
+    <string name="C_ServerSetupMainText">Track Server Setup</string>
+	<string name="C_SERVERURL">Server URL</string>	    
+	<string name="C_SERVERPORT">Server Port</string>	
+	<string name="C_SERVERROUTE">Server Route</string>	
+	<string name="C_TRACKFREQ">Track Freq</string>	
+    <string name="C_Save">Save</string>	
+    
+    <!--  Track Summary Dialog -->
+    <string name="C_TrackSummaryText">Track Summary</string>	
+    <string name="C_TRACKSUMMARY">Re-send</string>	    
+    
+	    	
+	<!-- Map Option Strings  -->	
+    <string name="C_MapOptionText">Map Options</string>    
+    <string name="C_Map">Map</string>  
+    <string name="C_Satellite">Satellite</string>  
+    <string name="C_Traffic">Traffic</string>  
+                	    
+    
+    
+</resources>

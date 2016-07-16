@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#DAE7EB">
+    
+    <TextView style="@style/ButtonFont" 
+        android:id="@+id/title" 
+        android:layout_marginLeft="5dip"
+        android:layout_marginTop="5dip"
+        android:layout_height="40dp"          
+        android:layout_width="fill_parent" 
+        android:text="@string/C_AddUser" 
+        android:layout_alignParentLeft="true">
+    </TextView>    
+   
+    <ListView
+        android:id="@+id/listContacts"
+        android:layout_width="fill_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="5dip"        
+        android:layout_marginRight="5dip" 
+        android:layout_below="@id/title"            
+        android:layout_height="300dip">
+    </ListView> 
+        
+</RelativeLayout>

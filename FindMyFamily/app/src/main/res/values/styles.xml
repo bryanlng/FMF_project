@@ -1,0 +1,46 @@
+<resources>
+
+    <!--
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    -->
+    <style name="AppBaseTheme" parent="android:Theme.Light">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+    </style>
+
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+
+    <string name="app_name">Find My Family</string>
+    <string name="app_version">3.0</string>
+    <string name="app_mainDisplay">Find My Family 3.0</string>
+    <string name="defaultAddress">wleungtx.no-ip.biz</string> 
+    	
+    <style name="InputFont">
+        <item name="android:textSize">15sp</item>        
+    </style> 
+    <style name="StatusStyle">
+        <item name="android:textSize">15sp</item>
+    </style>       
+    <style name="SmallButtonFont">
+        <item name="android:textSize">13sp</item>        
+    </style> 
+    <style name="SmallerFont">
+        <item name="android:textSize">10sp</item>        
+    </style>
+    <style name="VerySmallFont">
+        <item name="android:textSize">7sp</item>        
+    </style>             
+    <style name="MediumButtonFont">
+        <item name="android:textSize">20sp</item>        
+    </style>     
+    <style name="ButtonFont">
+        <item name="android:textSize">25sp</item>        
+    </style>        
+</resources>

@@ -18,3 +18,8 @@ t ls-files --others --exclude-from=.git/info/exclude
 **/log/**
 **/dist/**
 **/build/**
+#
+# Gradle build
+**/.gradle/**
+**/.idea/**
+*.iml

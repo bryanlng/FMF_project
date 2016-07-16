@@ -1,0 +1,85 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#DAE7EB">
+    
+    <TextView style="@style/ButtonFont" 
+        android:id="@+id/title" 
+        android:layout_marginLeft="5dip"
+        android:layout_marginTop="5dip"
+        android:layout_height="35dp"          
+ 		android:gravity="center"         
+        android:layout_width="fill_parent" 
+        android:text="@string/C_MapOptionText" 
+        android:layout_alignParentLeft="true">
+    </TextView>    
+    <TextView android:id="@+id/mapchoice"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="30dip"               
+        android:layout_marginTop="30dip"        
+        android:layout_below="@+id/title" 
+        android:layout_width="100dp" 
+        android:layout_height="30dp"     
+        android:textColor="#0000FF"            
+        android:text="@string/C_Map">         
+    </TextView>
+    <TextView android:id="@+id/satellitechoice"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="30dip"               
+        android:layout_marginTop="30dip"        
+        android:layout_below="@+id/mapchoice" 
+        android:layout_width="100dp" 
+        android:layout_height="30dp"     
+        android:textColor="#0000FF"            
+        android:text="@string/C_Satellite">         
+    </TextView>    
+    <RadioGroup android:id="@+id/mapOptions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"        
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical" 
+        android:layout_marginTop="30dip" 
+        android:layout_marginRight="30dip"         
+        android:layout_below="@+id/title"
+        android:layout_toRightOf="@id/mapchoice" >
+        <RadioButton 
+            android:id="@+id/mapRadio" 
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"></RadioButton>
+        <RadioButton android:id="@+id/satelliteRadio"
+            android:layout_marginTop="30dip" 
+            android:layout_height="30dp"
+            android:layout_width="wrap_content">         
+        </RadioButton>
+    </RadioGroup>   
+    <TextView android:id="@+id/traffictv"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="30dip"               
+        android:layout_marginTop="50dip"                
+        android:layout_below="@+id/mapOptions" 
+        android:layout_width="100dp" 
+        android:layout_height="30dp"     
+        android:textColor="#0000FF"            
+        android:text="@string/C_Traffic">         
+    </TextView>       
+    <CheckBox
+        android:id="@+id/trafficcb"
+        android:layout_width="wrap_content"
+        
+        android:layout_height="30dp"
+        android:layout_below="@+id/mapOptions"
+        android:layout_marginRight="30dip"     
+        android:layout_marginTop="50dip"        
+        android:layout_toRightOf="@id/traffictv"        
+        android:checked="true" />    
+    <TextView android:id="@+id/buffer"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="30dip"               
+        android:layout_below="@+id/traffictv" 
+        android:layout_width="wrap_content" 
+        android:layout_height="20dp"     
+        android:textColor="#0000FF">         
+    </TextView>    
+
+</RelativeLayout>

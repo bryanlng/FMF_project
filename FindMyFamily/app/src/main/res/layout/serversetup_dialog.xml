@@ -1,0 +1,100 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#DAE7EB">
+    
+    <TextView style="@style/ButtonFont" 
+        android:id="@+id/title" 
+        android:layout_marginLeft="5dip"
+        android:layout_marginTop="5dip"
+        android:layout_height="35dp"          
+ 		android:gravity="center"         
+        android:layout_width="fill_parent" 
+        android:text="@string/C_ServerSetupMainText" 
+        android:layout_alignParentLeft="true">
+    </TextView> 
+    <TextView android:id="@+id/serverURL"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="5dip"               
+        android:layout_marginTop="30dip"        
+        android:layout_below="@+id/title" 
+        android:layout_width="120dp" 
+        android:layout_height="35dp"     
+        android:textColor="#0000FF"            
+        android:text="@string/C_SERVERURL">         
+    </TextView>
+    <EditText android:id="@+id/serverURLET"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="5dip"               
+        android:layout_marginRight="10dip"      
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"        
+        android:layout_below="@+id/serverURL"       
+        android:textColor="#0000FF">         
+    </EditText>    
+ 
+    <TextView android:id="@+id/serverPort"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="5dip"               
+        android:layout_marginTop="30dip"        
+        android:layout_below="@+id/serverURLET" 
+        android:layout_width="120dp" 
+        android:layout_height="35dp"     
+        android:textColor="#0000FF"            
+        android:text="@string/C_SERVERPORT">         
+    </TextView>    
+    <EditText android:id="@+id/serverPortET"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="5dip"               
+        android:layout_marginRight="10dip"     
+        android:layout_marginTop="30dip"     
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"        
+        android:layout_below="@+id/serverURLET"    
+        android:layout_toRightOf="@+id/serverPort"   
+        android:textColor="#0000FF">         
+    </EditText>  
+    <TextView android:id="@+id/serverRoute"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="5dip"               
+        android:layout_marginTop="30dip"        
+        android:layout_below="@+id/serverPort" 
+        android:layout_width="120dp" 
+        android:layout_height="35dp"     
+        android:textColor="#0000FF"            
+        android:text="@string/C_SERVERROUTE">                 
+    </TextView>               
+    <EditText android:id="@+id/serverRouteET"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="5dip"               
+        android:layout_marginRight="10dip"     
+        android:layout_marginTop="30dip"     
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"        
+        android:layout_below="@+id/serverPort"    
+        android:layout_toRightOf="@+id/serverRoute"   
+        android:textColor="#0000FF">         
+    </EditText>      
+    <TextView android:id="@+id/trackFreq"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="5dip"               
+        android:layout_marginTop="30dip"        
+        android:layout_below="@+id/serverRoute" 
+        android:layout_width="120dp" 
+        android:layout_height="35dp"     
+        android:textColor="#0000FF"            
+        android:text="@string/C_TRACKFREQ">         
+    </TextView>     
+    <EditText android:id="@+id/trackFreqET"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="5dip"               
+        android:layout_marginRight="10dip"     
+        android:layout_marginTop="30dip"     
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"        
+        android:layout_below="@+id/serverRoute"    
+        android:layout_toRightOf="@+id/trackFreq"  
+        android:textColor="#0000FF">         
+    </EditText>      
+</RelativeLayout>

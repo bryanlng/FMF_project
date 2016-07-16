@@ -1,0 +1,138 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#DAE7EB">
+    
+    <TextView style="@style/ButtonFont" 
+        android:id="@+id/title" 
+        android:layout_marginLeft="5dip"
+        android:layout_marginTop="5dip"
+        android:layout_height="35dp"          
+ 		android:gravity="center"         
+        android:layout_width="fill_parent" 
+        android:text="@string/C_CommandsMainText" 
+        android:layout_alignParentLeft="true">
+    </TextView>
+    <TextView style="@style/MediumButtonFont" 
+        android:id="@+id/userName" 
+        android:layout_marginLeft="5dip"
+        android:layout_marginTop="5dip"
+        android:layout_height="25dp"          
+ 		android:gravity="center"         
+        android:layout_width="fill_parent" 
+        android:layout_below="@+id/title" >
+    </TextView>    
+    <TextView android:id="@+id/title1"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="5dip"               
+        android:layout_marginTop="30dip"        
+        android:layout_below="@+id/userName" 
+        android:layout_width="100dp" 
+        android:layout_height="35dp"     
+        android:textColor="#0000FF"            
+        android:text="@string/C_WIFI">         
+    </TextView>
+    <RadioGroup android:id="@+id/wifi"
+        android:layout_width="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal" 
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dip" 
+        android:layout_below="@+id/userName"
+        android:layout_toRightOf="@id/title1" >
+        <RadioButton 
+            android:id="@+id/radioWifiON" 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/C_ON"></RadioButton>
+        <RadioButton android:id="@+id/radioWifiOFF"
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content"
+            android:text="@string/C_OFF"></RadioButton>
+    </RadioGroup>   
+    <TextView android:id="@+id/title2"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="5dip"               
+        android:layout_marginTop="30dip"        
+        android:layout_below="@+id/title1" 
+        android:layout_width="100dp" 
+        android:layout_height="35dp"    
+        android:textColor="#0000FF"             
+        android:text="@string/C_GPS">         
+    </TextView>
+    <RadioGroup android:id="@+id/gps"
+        android:layout_width="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal" 
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dip" 
+        android:layout_below="@+id/title1"
+        android:layout_toRightOf="@id/title2" >
+        <RadioButton 
+            android:id="@+id/radioGPSON" 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/C_ON"></RadioButton>
+        <RadioButton android:id="@+id/radioGPSOFF"
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content"
+            android:text="@string/C_OFF"></RadioButton>
+    </RadioGroup>  
+    <TextView android:id="@+id/title3"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="5dip"               
+        android:layout_marginTop="25dip"        
+        android:layout_below="@+id/title2" 
+        android:layout_width="100dp" 
+        android:layout_height="60dp"     
+        android:textColor="#0000FF"            
+        android:text="@string/C_MDATA">         
+    </TextView>
+    <RadioGroup android:id="@+id/mdata"
+        android:layout_width="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal" 
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dip" 
+        android:layout_below="@+id/title2"
+        android:layout_toRightOf="@id/title3" >
+        <RadioButton 
+            android:id="@+id/radioMDATAON" 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/C_ON"></RadioButton>
+        <RadioButton android:id="@+id/radioMDATAOFF"
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content"
+            android:text="@string/C_OFF"></RadioButton>
+    </RadioGroup>  
+    <TextView android:id="@+id/title4"
+        style="@style/MediumButtonFont" 
+        android:layout_marginLeft="5dip"               
+        android:layout_marginTop="25dip"        
+        android:layout_below="@+id/title3" 
+        android:layout_width="100dp" 
+        android:layout_height="60dp"     
+        android:textColor="#0000FF"            
+        android:text="@string/C_TRACK">         
+    </TextView>
+    <RadioGroup android:id="@+id/track"
+        android:layout_width="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal" 
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dip" 
+        android:layout_below="@+id/title3"
+        android:layout_toRightOf="@id/title4" >
+        <RadioButton 
+            android:id="@+id/radioTRACKON" 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/C_ON"></RadioButton>
+        <RadioButton android:id="@+id/radioTRACKOFF"
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content"
+            android:text="@string/C_OFF"></RadioButton>
+    </RadioGroup>      
+</RelativeLayout>
