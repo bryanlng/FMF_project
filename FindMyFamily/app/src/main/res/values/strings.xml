@@ -46,7 +46,7 @@
     <string name="C_CLEARMAP">Clear Map</string>    
     
 	<!-- Tools Function Strings  -->
-    <string name="C_ServerSetupMainText">Track Server Setup</string>
+    <string name="C_ServerSetupMainText">FMF Server Setup</string>
 	<string name="C_SERVERURL">Server URL</string>	    
 	<string name="C_SERVERPORT">Server Port</string>	
 	<string name="C_SERVERROUTE">Server Route</string>	

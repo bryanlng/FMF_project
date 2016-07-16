@@ -86,7 +86,6 @@ public class Tools {
 
     public static int FMFTRACKTmer = 120000;
     //	public static String FMFTRACKSVAddr = "wleungtx.no-ip.biz";
-//	public static String FMFTRACKSVAddr = "135.60.10.255";
     public static String FMFTRACKSVAddr = "192.168.1.8";
 
     public static String FMFTRACKRoute = "location";
