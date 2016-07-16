@@ -69,7 +69,8 @@
         style="@style/MediumButtonFont" 
         android:layout_marginLeft="5dip"               
         android:layout_marginRight="10dip"     
-        android:layout_marginTop="30dip"     
+        android:layout_marginTop="30dip"
+        android:enabled="false"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"        
         android:layout_below="@+id/serverPort"    
@@ -83,14 +84,15 @@
         android:layout_below="@+id/serverRoute" 
         android:layout_width="120dp" 
         android:layout_height="35dp"     
-        android:textColor="#0000FF"            
-        android:text="@string/C_TRACKFREQ">         
+        android:textColor="#0000FF"
+        android:text="@string/C_TRACKFREQ">
     </TextView>     
     <EditText android:id="@+id/trackFreqET"
         style="@style/MediumButtonFont" 
         android:layout_marginLeft="5dip"               
         android:layout_marginRight="10dip"     
-        android:layout_marginTop="30dip"     
+        android:layout_marginTop="30dip"
+        android:enabled="false"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"        
         android:layout_below="@+id/serverRoute"    

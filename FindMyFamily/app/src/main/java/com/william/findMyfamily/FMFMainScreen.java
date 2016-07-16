@@ -1128,6 +1128,7 @@ public class FMFMainScreen extends FragmentActivity  implements FMFCallBackInter
         final EditText serverPort = (EditText) commandDialogView.findViewById(R.id.serverPortET);
         final EditText serverRoute = (EditText) commandDialogView.findViewById(R.id.serverRouteET);
         final EditText trackFreq = (EditText) commandDialogView.findViewById(R.id.trackFreqET);
+        final FMFMainScreen myFMFMainScreen = this;
 
         serverURL.setText(Tools.FMFTRACKSVAddr);
         serverPort.setText(new String("" + Tools.FMFTRACKSVPort));
@@ -1145,6 +1146,11 @@ public class FMFMainScreen extends FragmentActivity  implements FMFCallBackInter
                         Tools.FMFTRACKRoute = serverRoute.getText().toString();
                         Tools.FMFTRACKTmer = Integer.parseInt(trackFreq.getText().toString());
                         Tools.saveCurrentMapUsersToPropertiesfile(FMFMainScreen.this);
+                        // Now restart the FMFOfficeComm
+                        Tools.myOfficeConnection.stopCommunication();
+
+                        Tools.myOfficeConnection = new FMFOfficeComm(myFMFMainScreen);
+
                     }
                 })
                 .setNegativeButton(R.string.C_Cancel, new DialogInterface.OnClickListener() {
