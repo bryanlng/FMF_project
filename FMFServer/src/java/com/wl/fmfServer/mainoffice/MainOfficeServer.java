@@ -65,7 +65,7 @@ public class MainOfficeServer {
 
   // public static LinkedList<String> TargetHistoryList = new LinkedList<String>();
 
-   // Target List. From the FindMyPhone. Target = cellphones
+   // Target List. From the FindMyPhone. Target = cellphones. Strings are cellphone #s in string form
    public static Hashtable <String, MainOfficeHandler> targetHT = new Hashtable<String, MainOfficeHandler>();
 
    // Client List. From FindMyFamily. 

@@ -277,8 +277,9 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                 	// return Server status
                 	getOutBufferedWriter().write("["+FMFOFFICE_CLIENTRESPONSE_GETSERVERSTATUS+":"+clientPhone+":"+targetPhone+"]\n");
 
-                	//Gets all the Keys of targetInfoListHT, which are phones 
+                	//Gets all the phones of targetInfoListHT (phones)
                 	Enumeration<String> enumKey = MainOfficeServer.targetInfoListHT.keys();
+                	boolean daysUpPrintedAlready = false;
                 	while(enumKey.hasMoreElements()) {
                 		String key = enumKey.nextElement();		//get 
 
@@ -301,9 +302,13 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 	                    		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	                            String serverStartFormatted = dateFormat.format(Tools.getServerStart()); //Ex: 2014/08/06 15:59:48  
                     			int daysUp = Tools.compareDate(serverStartFormatted);
-                    			debugWrite("DaysUp:" + daysUp + " , Size:" + MainOfficeServer.targetHT.size());
-                    			getOutBufferedWriter().write("DaysUp:" + daysUp + " , Size:" + MainOfficeServer.targetHT.size());
-                            	getOutBufferedWriter().newLine();                        
+//                    			debugWrite("DaysUp:" + daysUp + " , Size:" + MainOfficeServer.targetHT.size());
+                    			if(!daysUpPrintedAlready){
+                    				getOutBufferedWriter().write("DaysUp:" + daysUp + " , Size:" + MainOfficeServer.targetHT.size());
+                    				daysUpPrintedAlready = true;
+                    			}
+                    			
+//                            	getOutBufferedWriter().newLine();                        
   
 //                    		}
                 			debugWrite("targetInfo: " + targetInfo.getTargetInfo(key));
@@ -378,9 +383,10 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                 	userID = targetPhone;          
                     String retString = extraStringFromBF(
                     		getInReader(),addCommandBracket(FMFOFFICE_TARGETRESPONSE_END),null );
-                    System.out.println("Extracted String:->"+retString+"<-");
+                    System.out.println("retString is the Extracted String:->"+retString+"<-");
+                    System.out.println("targetPhone: " + targetPhone);
                     
-                    // Convert String to Object
+                    // Convert String to a FMPLocationData Object
                     FMPLocationData locationData = new FMPLocationData();
                     locationData.composeObjectFromMessage(retString, targetPhone);
                     System.out.println("Converted this record:"+locationData.getPhoneNumber()+" to Object printout:->"+locationData+"<-");
