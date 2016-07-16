@@ -22,4 +22,7 @@ t ls-files --others --exclude-from=.git/info/exclude
 # Gradle build
 **/.gradle/**
 **/.idea/**
+**/gradle/**
 *.iml
+gradlew
+gradlew.bat
