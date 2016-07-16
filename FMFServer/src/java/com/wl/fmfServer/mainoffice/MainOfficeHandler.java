@@ -2,7 +2,7 @@ package com.wl.fmfServer.mainoffice;
 
 import com.william.fmfCommon.FMCRawLocation;
 import com.william.fmfCommon.FMCLocationData;
-import com.william.fmfCommon.FMCMessage;
+import com.william.fmfCommon.FMCMessage;	//FMCMessage was created to house all the string names
 import com.wl.fmfServer.data.TcpDataCommunication;
 import com.wl.fmfServer.data.Tools;
 
@@ -260,6 +260,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 //                    			debugWrite("DaysUp:" + daysUp + " , Size:" + MainOfficeServer.targetHT.size());
                     			if(!daysUpPrintedAlready){
                     				getOutBufferedWriter().write("DaysUp:" + daysUp + " , Size:" + MainOfficeServer.targetHT.size());
+                    				getOutBufferedWriter().newLine();
                     				daysUpPrintedAlready = true;
                     			}
                     			
@@ -347,7 +348,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                     System.out.println("Converted this record:"+locationData.getPhoneNumber()+" to Object printout:->"+locationData+"<-");
                     
                     
-                    MainOfficeServer.targetHT.put (targetPhone, this);  
+                    MainOfficeServer.targetHT.put (targetPhone, this);  //put the targetPhone into the MainOfficeServer hashtable targetHT
                     
                     // Now put this info into LinkedList
                     //Get the information of the target from targetInfoListHT, which is a Hashtable that 
