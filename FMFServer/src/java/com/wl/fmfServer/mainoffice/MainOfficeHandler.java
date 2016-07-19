@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.Enumeration;
 
 import javax.net.ssl.SSLSocket;
+import java.sql.*;
 
 /*
 This will be used by both target connection and client connection
@@ -34,7 +35,8 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
     private String userID;
     
     private String targetLastKeepAlive=null;
-    private String targetLoginTime=null;    
+    private String targetLoginTime=null;
+    private String query;
 
     public MainOfficeHandler() {}
 
@@ -254,12 +256,13 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 //                    		else{
                     			//Display time in days since the server started running (aka
                     			//Display # of targets
-	                    		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-	                            String serverStartFormatted = dateFormat.format(Tools.getServerStart()); //Ex: 2014/08/06 15:59:48  
-                    			int daysUp = Tools.compareDate(serverStartFormatted);
+//	                    		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//	                            String serverStartFormatted = dateFormat.format(Tools.getServerStart()); //Ex: 2014/08/06 15:59:48  
+//                    			int daysUp = Tools.compareDate(serverStartFormatted);
+                    			int daysUp = (int)Tools.compareTimeInDays(System.currentTimeMillis());
 //                    			debugWrite("DaysUp:" + daysUp + " , Size:" + MainOfficeServer.targetHT.size());
                     			if(!daysUpPrintedAlready){
-                    				getOutBufferedWriter().write("DaysUp:" + daysUp + " , Size:" + MainOfficeServer.targetHT.size());
+                    				getOutBufferedWriter().write("DaysUp:" + daysUp + ", SQL:" + Tools.getIsSQLUP() + " , Size:" + MainOfficeServer.targetHT.size());
                     				getOutBufferedWriter().newLine();
                     				daysUpPrintedAlready = true;
                     			}
@@ -331,7 +334,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                     
                     
                 }
-                else if (command.equals(FMCMessage.FMFOFFICE_TARGETKEEPALIVE))		//TargetKAlive
+                else if (command.equals(FMCMessage.FMFOFFICE_TARGETKEEPALIVE))		//////////////////////TargetKAlive
                 {
                 	debugWrite("FMFOFFICE_TARGETKEEPALIVE");
                 	connectionType=TARGET_CONNECTION;
@@ -346,8 +349,133 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
                     FMCLocationData locationData = new FMCLocationData();
                     locationData.composeObjectFromMessage(retString, targetPhone);	//fill the FMPLocationData object with info from retString
                     System.out.println("Converted this record:"+locationData.getPhoneNumber()+" to Object printout:->"+locationData+"<-");
+                    /**************************************************SQL Database integration HERE************************************
+                     * SQL Database integration HERE
+                     * Putting raw string --> FMCLocationData object is helpful, b/c for SQL integration, now all we have 
+                     * to do is call getter methods 
+                     */
+                    //STEP 4: Execute a query
+                    /* First test to see if the phoneNumber is in the database using a SELECT statement
+                     * If it's not ==> add it and it's fields into the database using INSERT statement
+                     * If it is ==> update fields using UPDATE...SET...WHERE
+                     * http://stackoverflow.com/questions/16099382/java-mysql-check-if-value-exists-in-database
+                     * http://stackoverflow.com/questions/30860186/check-if-value-exists-in-mysql-db-in-java
+                     * Use PreparedStatement instead of Statement to prevent SQL injections
+                     */
+                    /*****************************************non_location_fields table*************************************/
+                    query = "SELECT ChargingMode from non_location_fields where PhoneNumber = ?";	//test to see if the phoneNumber is in the database using a SELECT statement
+                    MainOfficeServer.statement = MainOfficeServer.connection.prepareStatement(query);
+                    MainOfficeServer.statement.setString(1, locationData.getPhoneNumber());
+
+                   	try{
+                       	ResultSet resultSet = MainOfficeServer.statement.executeQuery();
+                       	System.out.println("Executing test query for phoneNumber: " + locationData.getPhoneNumber());
+                       	
+                   		//statements written here so that we can reuse code
+                       	int rowsAffected;
+                   		String mobileData, gps, network;
+                   		mobileData = (locationData.isMobileDataON()) ? "ON" : "OFF";
+                   		gps = (locationData.isGPSON()) ? "ON" : "OFF";
+                   		network = (locationData.isNetworkON()) ? "ON" : "OFF";
+                   		
+                   		//if the current row is not valid ==> phoneNumber isn't in there ==> insert into database
+                   		if(!resultSet.next()){	
+                      		query = "INSERT INTO non_location_fields values(?,?,?,?,?,?)";
+                      		MainOfficeServer.statement = MainOfficeServer.connection.prepareStatement(query);
+                            MainOfficeServer.statement.setString(1, locationData.getPhoneNumber());
+                            MainOfficeServer.statement.setString(2, locationData.getChargingMethod());
+                            MainOfficeServer.statement.setString(3, mobileData);
+                            MainOfficeServer.statement.setString(4, gps);
+                            MainOfficeServer.statement.setString(5, network);
+                            MainOfficeServer.statement.setString(6, locationData.getRawWifiMessage());
+                          //printout so we can see what's going on
+                       		getOutBufferedWriter().write("phoneNumber: " + locationData.getPhoneNumber() + 
+                       				", chargingMethod: " + locationData.getChargingMethod() + 
+                       				", mobileData: " + mobileData + ", gps: " + gps + 
+                       				", network: " + network + ", wifi: " + locationData.getRawWifiMessage());
+                            getOutBufferedWriter().newLine();
+                            try{
+                            	rowsAffected = MainOfficeServer.statement.executeUpdate();
+                            }
+                            catch(SQLException se1){
+                            	se1.printStackTrace();
+                            }
+                            
+                   		}
+                   		//if the current row is valid ==> phoneNumber exists in there ==> simply update
+                   		else{
+                   			query = "UPDATE non_location_fields SET ChargingMode = ?, MobileData = ?, GPS = ?, MobileNetwork = ?, Wifi = ? WHERE PhoneNumber = ?";
+                      		MainOfficeServer.statement = MainOfficeServer.connection.prepareStatement(query);
+                      		MainOfficeServer.statement.setString(6, locationData.getPhoneNumber());
+                            MainOfficeServer.statement.setString(1, locationData.getChargingMethod());
+                            MainOfficeServer.statement.setString(2, mobileData);
+                            MainOfficeServer.statement.setString(3, gps);
+                            MainOfficeServer.statement.setString(4, network);
+                            MainOfficeServer.statement.setString(5, locationData.getRawWifiMessage());
+                            //printout so we can see what's going on
+                            getOutBufferedWriter().write("phoneNumber: " + locationData.getPhoneNumber() + 
+                       				", chargingMethod: " + locationData.getChargingMethod() + 
+                       				", mobileData: " + mobileData + ", gps: " + gps + 
+                       				", network: " + network + ", wifi: " + locationData.getRawWifiMessage());
+                            getOutBufferedWriter().newLine();
+                            try{
+                            	rowsAffected = MainOfficeServer.statement.executeUpdate();
+                            }
+                            catch(SQLException se1){
+                            	se1.printStackTrace();
+                            }
+                   		}
+
+                   	}
+                   	catch(SQLException se){
+                   		se.printStackTrace();
+                   	}
+//                   	resultSet.close();
+                   	
+                   	/*****************************************location_fields table*************************************/
+                   	//Don't have to check if the phoneNumber is already in there, just put entry in regardless
+                   	try{
+                       	System.out.println("Executing insert query for location_fields phoneNumber: " + locationData.getPhoneNumber());
+                       	
+                   		//statements written here so that we can reuse code
+                       	int rowsAffected;
+                       	
+                   		
+                   		//if the current row is not valid ==> phoneNumber isn't in there ==> insert into database
+                  		query = "INSERT INTO location_fields values(?,?,?,?,?,?,?)";
+                  		MainOfficeServer.statement = MainOfficeServer.connection.prepareStatement(query);
+                        MainOfficeServer.statement.setString(1, locationData.getPhoneNumber());			//phone number
+                        MainOfficeServer.statement.setString(2, locationData.getTimeReceived());		//time received in Date format
+                        MainOfficeServer.statement.setLong(3, locationData.getTimeReceivedInMillis());	//time received in Millis
+                        MainOfficeServer.statement.setString(4, locationData.getBestLocation().getOriginalLocationString());		//best location
+                        MainOfficeServer.statement.setString(5, locationData.getFMPLocation(0).getOriginalLocationString());	//loc 1 aka gps
+                        MainOfficeServer.statement.setString(6, locationData.getFMPLocation(1).getOriginalLocationString());	//loc 2 aka network
+                        MainOfficeServer.statement.setInt(7, locationData.getBatteryLevel());	//battery level
+                        //printout so we can see what's going on
+                   		getOutBufferedWriter().write("phoneNumber: " + locationData.getPhoneNumber() + 
+                   				", TimeRecieved: " + locationData.getTimeReceived() + 
+                   				", TimeRecieved (millis): " + locationData.getTimeReceivedInMillis() + 
+                   				", BestLocation: " + locationData.getBestLocation().getOriginalLocationString() + 
+                   				", Location_1: " + locationData.getFMPLocation(0).getOriginalLocationString() +
+                   				", Location_2: " + locationData.getFMPLocation(0).getOriginalLocationString() +
+                   				", BatteryLevel: " + locationData.getBatteryLevel());
+                        getOutBufferedWriter().newLine();
+                         try{
+                          	rowsAffected = MainOfficeServer.statement.executeUpdate();
+                         }
+                         catch(SQLException se1){
+                          	se1.printStackTrace();
+                         }
+                          
+                   		
+                   		
+                   	}
+                   	catch(SQLException se){
+                   		se.printStackTrace();
+                   	}
                     
-                    
+//                    MainOfficeServer.statement.executeQuery(query);
+
                     MainOfficeServer.targetHT.put (targetPhone, this);  //put the targetPhone into the MainOfficeServer hashtable targetHT
                     
                     // Now put this info into LinkedList

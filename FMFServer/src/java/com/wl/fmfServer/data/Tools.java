@@ -59,7 +59,9 @@ public class Tools
 
     public static Logger logger;
     
-    public static Date serverStart;
+//    public static Date serverStart;
+    public static long startTime;
+    public static String sqlUp = "DOWN";
     
     /*
      * Assumes that prevDayAndTime comes in format yyyy-mm-dd
@@ -386,14 +388,31 @@ public class Tools
    	
     }
     
-    public static void startServerCalendar(){
-//    	serverStart = Calendar.getInstance();
-    	serverStart = new Date();
+//    public static void startServerCalendar(){
+////    	serverStart = Calendar.getInstance();
+//    	serverStart = new Date();
+//    }
+    
+//    public static Date getServerStart(){
+//    	return serverStart;
+//    }
+    public static void startServerTimer(){
+    	startTime = System.currentTimeMillis();
+    }
+    public static long compareTimeInDays(long currentTime){
+    	long diff = currentTime - startTime;
+    	return diff / 86400000; //1000 milliseconds x 60 seconds x 60 min x 24 hours
     }
     
-    public static Date getServerStart(){
-    	return serverStart;
+    public static String getIsSQLUP(){
+    	return sqlUp;
     }
+    
+    public static void setIsSQLUP(String b){
+    	sqlUp = b;
+    }
+    
+    
     		
     	
     		

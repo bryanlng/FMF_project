@@ -13,13 +13,15 @@ public class FMCRawLocation {
 	
 	private String mProvider="";
 	private long mTime=0;
+	private String formattedTime="";
 	private double mLatitude=0;
 	private double mLongitude=0;
 	private float mAccuracy=0;
 	private float mBearing=0;	
 	private float mSpeed=0;
 	//private int mNumOfSat=0;
-			
+	
+	private String originalLocationString="";
 	
 	public FMCRawLocation()
 	{}
@@ -33,9 +35,14 @@ public class FMCRawLocation {
 	{
        //Sample locationString: "network 2014/01/20 17:33:22 32.9759 -96.7204 1210 21 22"
        // String a = locationString.substring(locationString.indexOf("<")+1,locationString.indexOf(">"));
+		
+		setOriginalLocationString(locationString);
+		
+		
         String[] result = locationString.split(" "); //remove spaces ==> put into String array 
         System.out.println("location has elmements:"+result.length);
         setProvider(result[0]);	//set provider to be "network"
+        setTimeInDateFormat(result[1] + result[2]);	//put the time received in a string format
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
 
         try {
@@ -113,6 +120,15 @@ public class FMCRawLocation {
 		return mTime;	
 	}
 	
+	public void setTimeInDateFormat( String time)
+	{
+		formattedTime = time;	
+	}	
+	public String getTimeInDateFormat()
+	{
+		return formattedTime;	
+	}
+	
 	public void setLatitude(double latitude)
 	{
 		mLatitude=latitude;		
@@ -156,6 +172,17 @@ public class FMCRawLocation {
 	public float getSpeed()
 	{
 		return mSpeed;		
+	}
+	
+	/*
+	 * This method was created in order bestLocation (inside FMCLocationData) to be able to get it's original string
+	 */
+	public String getOriginalLocationString(){
+		return originalLocationString;
+	}
+	
+	public void setOriginalLocationString(String s){
+		originalLocationString = s;
 	}
 	
 	public String toString()

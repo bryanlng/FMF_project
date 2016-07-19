@@ -23,6 +23,8 @@ public class FMCLocationData{
 
     private String phoneNumber="";
     private String updateDateString="";
+    private String timeReceived="";
+    private long timeReceivedInMillis=0;
     private int batteryLevel=0;
     private String chargingMethod="";
     private boolean isMobileDataON=false;
@@ -36,10 +38,13 @@ public class FMCLocationData{
     private String wifiStatus="";
     private String [] wifiAvailableSSIDs;
     private String connectedWifiSSID="";
+    private String fullWifiMessage="";
 
     private String[] messagesToSend=null;
     private String[] messagesReceived=null;
     private boolean messageDecodeCompleted=false;
+    
+    
 
 
     private int maxMessageSize=140;
@@ -290,7 +295,8 @@ public class FMCLocationData{
                 }
                 else if (lines[i].contains(MSGTAG_DATE))						//"DE:", length = 3, Extract date
                 {
-                    this.setUpdateDateString( lines[i].substring(MSGTAG_DATE.length() )) ;
+//                    this.setUpdateDateString( lines[i].substring(MSGTAG_DATE.length() )) ;
+                	 //Leave deprecated
                 }
                 else if (lines[i].contains(MSGTAG_BATTERY))						//"BA:", length = 3
                 {
@@ -330,11 +336,14 @@ public class FMCLocationData{
                 else if (lines[i].contains(MSGTAG_LOCATION))					//"LOC:", length = 4
                 {
                 // * LOC:1 <network 2014/01/20 17:33:22 32.9759 -96.7204 1210>
-                	FMCRawLocation location = new FMCRawLocation();
+                	FMCRawLocation location = new FMCRawLocation();	//create a new FMCRawLocation 
                 	//extract the "network 2014/01/20 17:33:22 32.9759 -96.7204 1210" part out
                     String locationString = lines[i].substring(lines[i].indexOf("<")+1,lines[i].indexOf(">"));
-
-                	location.convertFromStringToObject(locationString);                	
+                    System.out.println("locationString: " + locationString);
+                	location.convertFromStringToObject(locationString);    //fill location with data 
+                	setTimeReceived(location.getTimeInDateFormat());		//set time field (string) so MainOfficeHandler can use it
+                	setTimeReceivedInMillis(location.getTime());			//set time field in millis(long) so MainOfficeHandler can use it
+                	
                 	
                 	System.out.println("My location is "+location.getProvider());	//either "network" or "gps"
                     if (location.getProvider().equalsIgnoreCase(FMCRawLocation.LOCATION_GPS_STRING)){	//LOCATION_GPS_STRING = gps
@@ -347,11 +356,12 @@ public class FMCLocationData{
                 }
                 else if (lines[i].contains(MSGTAG_WIFI)) {						//"WF:", length = 3
                 //* WF:ENC <<Yeah5>> or WF:DIS or WF:ENG or WF:ENN <ATT88,ADF,WWFWE>
-                    setWifiStatus(lines[i].substring(lines[i].indexOf(":")+1, lines[i].indexOf(":")+4));	//set wifi status to be the word after "WF:". Ex: "ENC"
+                	fullWifiMessage = lines[i];
+                	setWifiStatus(lines[i].substring(lines[i].indexOf(":")+1, lines[i].indexOf(":")+4));	//set wifi status to be the word after "WF:". Ex: "ENC"
                     if (lines[i].contains("<<"))
                     {
                         this.connectedWifiSSID = lines[i].substring(lines[i].indexOf("<<")+2, lines[i].indexOf(">>"));
-                        //Wifi SSID = wife name
+                        //Wifi SSID = wifi name
                         //Ex: connectedWifiSSID = Yeah5
                         
                     }
@@ -590,7 +600,26 @@ public class FMCLocationData{
     public void setMaxMessageSize(int maxMessageSize) {
         this.maxMessageSize = maxMessageSize;
     }
-
+    
+    public String getRawWifiMessage(){
+    	return fullWifiMessage;
+    }
+    
+    public String getTimeReceived(){
+    	return timeReceived;
+    }
+    
+    public void setTimeReceived(String s){
+    	timeReceived = s;
+    }
+    
+    public long getTimeReceivedInMillis(){
+    	return timeReceivedInMillis;
+    }
+    
+    public void setTimeReceivedInMillis(long s){
+    	timeReceivedInMillis = s;
+    }
 
     public boolean equals(Object o)
     {
