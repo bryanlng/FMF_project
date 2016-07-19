@@ -336,15 +336,13 @@ public class FMCLocationData{
                 else if (lines[i].contains(MSGTAG_LOCATION))					//"LOC:", length = 4
                 {
                 // * LOC:1 <network 2014/01/20 17:33:22 32.9759 -96.7204 1210>
-                	FMCRawLocation location = new FMCRawLocation();	//create a new FMCRawLocation 
+                	FMCRawLocation location = new FMCRawLocation();
                 	//extract the "network 2014/01/20 17:33:22 32.9759 -96.7204 1210" part out
                     String locationString = lines[i].substring(lines[i].indexOf("<")+1,lines[i].indexOf(">"));
                     System.out.println("locationString: " + locationString);
                 	location.convertFromStringToObject(locationString);    //fill location with data 
                 	setTimeReceived(location.getTimeInDateFormat());		//set time field (string) so MainOfficeHandler can use it
                 	setTimeReceivedInMillis(location.getTime());			//set time field in millis(long) so MainOfficeHandler can use it
-                	
-                	
                 	System.out.println("My location is "+location.getProvider());	//either "network" or "gps"
                     if (location.getProvider().equalsIgnoreCase(FMCRawLocation.LOCATION_GPS_STRING)){	//LOCATION_GPS_STRING = gps
                         fMPLocations[LOCATION_GPS] = location; //fMPLocations[0] = location; Add location into fMPLocations[0]
