@@ -50,7 +50,7 @@
         </activity>
 
         <receiver
-            android:name="com.william.findMyfamily.InfoReceiver"
+            android:name="com.william.findMyfamily.FMFSMSReceiver"
             android:enabled="true"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED" >
             <intent-filter android:priority="999" >

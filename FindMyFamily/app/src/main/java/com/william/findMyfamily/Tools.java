@@ -85,8 +85,8 @@ public class Tools {
     public static String FMFTRACK_STATE = "STATE";
 
     public static int FMFTRACKTmer = 120000;
-    //	public static String FMFTRACKSVAddr = "wleungtx.no-ip.biz";
-    public static String FMFTRACKSVAddr = "192.168.1.8";
+    public static String FMFTRACKSVAddr = "wleungtx.no-ip.biz";
+//    public static String FMFTRACKSVAddr = "192.168.1.20"; //192.168.1.22/
 
     public static String FMFTRACKRoute = "location";
     public static int FMFTRACKSVPort = 8081;
