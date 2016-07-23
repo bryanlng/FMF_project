@@ -3,6 +3,8 @@ package com.wl.fmfServer.data;
 import java.text.*;
 import java.util.Vector;
 import java.security.MessageDigest;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -12,6 +14,10 @@ import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.*;
+
+import com.wl.fmfServer.mainoffice.MainOfficeHandler;
+import com.wl.fmfServer.mainoffice.MainOfficeServer;
+import com.william.fmfCommon.FMCLocationData;
 
 
 
@@ -412,6 +418,259 @@ public class Tools
     	sqlUp = b;
     }
     
+    /*
+     * Deletes records from table2 (locations) database
+     * Ex: if numDaysOld = 2, then we delete any records 
+     * Since millisecond count increases every day, less milliseconds ==> "older" days ==> thus we would delete
+     */
+    public static void cleanupRecords(long numDaysOld){
+    	if(numDaysOld <= 0){
+    		System.out.println("You cannot clean up records less than a day old");
+    	}
+    	else{
+    		long timeRightNow = System.currentTimeMillis();
+    		long nthday = timeRightNow - (numDaysOld*86400000); 	//86400000 = # milliseconds per day. ,
+       		System.out.println("Deleting rows from location_fields where DateInMilliseconds >= " + nthday);
+
+    		try{
+    			int rowsAffected = 0;	//field required for executeUpdate(), which works with DELETE statements
+    			
+    			/******1) Delete row from non_location_fields******/
+    			String query = "DELETE FROM non_location_fields WHERE DateInMilliseconds <= ?";
+        		MainOfficeServer.statement = MainOfficeServer.connection.prepareStatement(query);
+        		MainOfficeServer.statement.setLong(1, nthday);
+        		
+        		//printout so we can see what's going on
+           		try{
+                   	rowsAffected = MainOfficeServer.statement.executeUpdate();
+           		}
+           		catch(SQLException se1){
+        			se1.printStackTrace();
+        			se1.getMessage();
+        		}
+           		
+    			/******2) Delete row from location_fields******/
+           		query = "DELETE FROM location_fields WHERE DateInMilliseconds <= ?";
+        		MainOfficeServer.statement = MainOfficeServer.connection.prepareStatement(query);
+        		MainOfficeServer.statement.setLong(1, nthday);
+        		
+        		//printout so we can see what's going on
+           		try{
+                   	rowsAffected = MainOfficeServer.statement.executeUpdate();
+           		}
+           		catch(SQLException se1){
+        			se1.printStackTrace();
+        			se1.getMessage();
+        		}
+
+    		}
+    		catch(SQLException se){
+    			se.printStackTrace();
+    			se.getMessage();
+    		}
+    		
+    		
+    	}
+    }
+    
+    
+    /*
+     * For a user, get data from databases ==> return an array of FMCLocationData Objects within the given times
+     * Assume Date objects for begin and end are accurate
+     * Conditions:
+     * 	1) numLocations >= 1
+     *  2) Date begin must be past Date end
+     *  3) Stuff regarding # of times:
+     *  	a) By default, if you ask for more locations than there are available locations for that phone #
+     *  		==> return max amount of available locations for that phone #
+     *  	b) If there are 200 locations available within the given time period, and they ask for 10
+				Return 10 evenly spaced (in terms of time) locations, or the closest possible
+     */
+    public static FMCLocationData[] getLocationsBetweenTimes(String phoneNumber, Date begin, Date end,int numLocations){
+    	FMCLocationData[] locations = new FMCLocationData[numLocations];
+    	
+    	if(numLocations < 1){
+    		System.out.println("numLocations must be at least 1, it currently is: " + numLocations);
+    	}
+    	
+    	long beginTime = begin.getTime();
+    	long endTime = end.getTime();
+    	
+    	if((endTime - beginTime) < 0){
+    		System.out.println("Beginning time must start before end time");
+    		return locations;
+    	}
+    	
+    	try{ //Get fields from 2 tables: non_location_fields and location_fields. 
+    		 //This means there will be 3 separate queries ==> 3 separate ResultSet objects
+    		 /*
+    		  * 1) Query 1: Find out # rows that fit the conditions. Only have to do this on one table because
+    		  * 		both tables should have the SAME AMOUNT of entries, of which each entry has a 
+    		  * 		corresponding entry in the other table
+    		  * 2) Query 2: Get all the rows that fit the conditions from non_location_fields ==> extract data
+    		  * 3) Query 3: Get all the rows that fit the conditions from location_fields ==> extract data
+    		  * 
+    		  * Then, we will use the extracted data ==> create FMCLocationData objects ==> fill array
+    		  */
+    		/*********** Query 1 from LOCATION_FIELDS: Get # of rows********************************************************************************************/
+    		ResultSet resultSet;
+    		String query = "SELECT COUNT(PhoneNumber) FROM (SELECT PhoneNumber FROM location_fields WHERE PhoneNumber = ? and DateInMilliseconds between ? and ?) AS T";
+    		MainOfficeServer.statement = MainOfficeServer.connection.prepareStatement(query);
+    		MainOfficeServer.statement.setString(1, phoneNumber);
+    		MainOfficeServer.statement.setLong(2, beginTime);
+    		MainOfficeServer.statement.setLong(3, endTime);
+       		
+       		//printout so we can see what's going on
+    		SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY/MM/DD HH:MM:SS");
+       		System.out.println("Finding # of rows from location_fields during time period: " 
+       				+ dateFormat.format(begin) + " - " + dateFormat.format(end));
+       		
+       		resultSet = MainOfficeServer.statement.executeQuery();
+       		
+       		int locationsExtracted = 0;	//# of FMCLocationData objects actually found in the database
+       		if(resultSet.next()){	//if current row is valid, then extract
+       			locationsExtracted = resultSet.getInt("COUNT(PhoneNumber)");
+       		}
+       		else{
+       			
+       		}
+    		
+       		
+       		
+    		/***********Query 2 from NON_LOCATION_FIELDS: Extract data************************************************************************/
+       		query = "SELECT * FROM non_location_fields WHERE PhoneNumber = ? and DateInMilliseconds between ? and ? ORDER BY DateInMilliseconds desc";
+    		MainOfficeServer.statement = MainOfficeServer.connection.prepareStatement(query);
+    		MainOfficeServer.statement.setString(1, phoneNumber);
+    		MainOfficeServer.statement.setLong(2, beginTime);
+    		MainOfficeServer.statement.setLong(3, endTime);
+    		
+    		//printout so we can see what's going on
+       		System.out.println("Extracting rows from non_location_fields during time period: " 
+       				+ dateFormat.format(begin) + " - " + dateFormat.format(end));
+       		
+       		//execute query1 and extract data elements. Should only return 1 row
+       		//Create variables here so that they can be used at the very end when we put stuff into FMCLocationData objects ==> then into the array
+       		resultSet = MainOfficeServer.statement.executeQuery();
+       		String charging = "";
+       		boolean mobiledata = false;
+       		boolean gps = false;
+       		boolean mobilenetwork = false;
+       		String wifi = "";
+ 
+       		if(resultSet.next()){	//if current row is valid, then extract
+       			//don't need phoneNumber, we got that already
+       			charging = resultSet.getString("ChargingMode");
+       			String mobiledataString = resultSet.getString("MobileData");
+       			String gpsString = resultSet.getString("GPS");
+       			String mobilenetworkString = resultSet.getString("MobileNetwork");
+       			wifi = resultSet.getString("Wifi");
+       			
+       			//since inside FMCLocationData, the fields above (except charging,wifi) are booleans, we need to do some logic here
+       			mobiledata = (mobiledataString.equals("ON")) ? true : false;
+       			gps = (gpsString.equals("ON")) ? true : false;
+       			mobilenetwork = (mobilenetworkString.equals("ON")) ? true : false;
+       			
+       			
+       		}
+       		else{
+       			throw new SQLException("getLocationsBetweenTimes method: something messed up");
+       		}
+       		
+       		/***********Query 3 from LOCATION_FIELDS: Extract data ************************************************************************/
+    		
+    		query = "SELECT * FROM location_fields WHERE PhoneNumber = ? and DateInMilliseconds between ? and ? ORDER BY DateInMilliseconds desc";
+    		MainOfficeServer.statement = MainOfficeServer.connection.prepareStatement(query);
+    		MainOfficeServer.statement.setString(1, phoneNumber);
+    		MainOfficeServer.statement.setLong(2, beginTime);
+    		MainOfficeServer.statement.setLong(3, endTime);
+    		
+    		//printout so we can see what's going on
+       		System.out.println("Extracting rows from location_fields during time period: " 
+       				+ dateFormat.format(begin) + " - " + dateFormat.format(end));
+       		
+       		//execute query2 and extract data elements
+       		/* For each row
+       		 *  1) Extract data elements
+       		 *  2) Combine w/ query1 elements to form a FMCLocationData object
+       		 *  3) Add into array
+       		 */
+       		
+//       		ArrayList<FMCLocationData> allLocations = new ArrayList<FMCLocationData>();
+       		FMCLocationData[] allLocations = new FMCLocationData[locationsExtracted];	//temporary array to house all the FMCLocationData objects
+       		resultSet = MainOfficeServer.statement.executeQuery();
+       		int index = 0;
+      		while(resultSet.next()){
+      			String datetime = resultSet.getString("DateTimeReceived");
+       			long datemillis = resultSet.getLong("DateInMilliseconds");
+       			String best = resultSet.getString("BestLocation");
+       			String loc1 = resultSet.getString("Location_1");
+       			String loc2 = resultSet.getString("Location_2");
+       			int battery = resultSet.getInt("BatteryLevel");
+       			     			
+//       		    public FMCLocationData(String phone, String timeR, long timemillis, int battery, String charging, boolean mobiled,
+//       		    		boolean gps, boolean network, String wifi, String best, String loc1, String loc2)
+       			
+       			//create a new FMCLocationData object with the extracted data
+       			FMCLocationData temp = new FMCLocationData(phoneNumber, datetime,datemillis, battery, charging, mobiledata, gps,mobilenetwork,wifi, best, loc1, loc2);
+       			allLocations[index] = temp;					//place FMCLocationData object inside a temporary array
+       			index++;
+      		}
+ 
+      		/*
+      		 * Now compare values of locationsExtracted and numLocations
+      		 * Possible situations:
+      		 * 1) numLocations >= locationsExtracted:
+      		 * 		-Means that we wanted more locations than were available
+      		 * 		-Thus, we just return all the locations
+      		 * 2) numLocations < locationsExtracted:
+      		 * 		-Means that we have to evenly space out (numLocation) amount of locations over the entire timespan
+      		 * 		-Also, there's the added fact that most likely, the split will not exactly coincide with a location
+      		 * 		-Situations:
+      		 * 			A)If numLocations == 1
+      		 * 				-Get the most recent location
+      		 * 				-This should be at the top, since we ordered it by DateInMilliseconds and put it in descending order
+      		 * 			B)If numLocations == 2
+      		 * 				-Get the most recent location + least recent location
+      		 * 				-Locations should be at the top and bottom, since we ordered it by DateInMilliseconds and put it in descending order
+      		 * 			C) Anything else
+      		 * 				
+      		 */
+      		
+      		if( numLocations >= locationsExtracted){
+      			for(int i = 0; i < locationsExtracted; i++){
+      				locations[i] = allLocations[i];
+      			}
+      		}
+      		else{
+      			if(numLocations == 1){
+      				locations[0] = allLocations[0];
+      			}
+      			else if(numLocations == 2){
+      				locations[0] = allLocations[0];
+      				locations[1] = allLocations[allLocations.length - 1];
+      			}
+      			else{
+      			     /*  	b) If there are 200 locations available within the given time period, and they ask for 10
+     				Return 10 evenly spaced (in terms of time) locations, or the closest possible*/
+      				int average = locationsExtracted / numLocations; 	//this will truncate so we can get a somewhat even distribution
+      				int locationIndex = 0;
+      				for(int k = 0; k < locationsExtracted; k += average){
+      					locations[locationIndex] = allLocations[k];
+      					locationIndex++;
+      				}
+      			}
+      		}
+		}
+		catch(SQLException se){
+			se.printStackTrace();
+		}
+    	
+    	
+    	return locations;
+    	
+    	
+    	
+    }
     
     		
     	
