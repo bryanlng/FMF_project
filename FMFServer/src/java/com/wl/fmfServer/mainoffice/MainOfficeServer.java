@@ -70,11 +70,21 @@ public class MainOfficeServer {
         try{
             //STEP 2: Register JDBC driver
             Class.forName("com.mysql.jdbc.Driver");
+            
+
+            String mysqlHost = prop.getProperty(Tools.MAINOFFICE_MYSQLHOST);
+            if (mysqlHost==null) mysqlHost = DB_URL;
+            
+            String mysqlUserID = prop.getProperty(Tools.MAINOFFICE_MYSQLUSERID);
+            if (mysqlUserID==null) mysqlUserID = USERNAME;
+
+            String mysqlPassword = prop.getProperty(Tools.MAINOFFICE_MYSQLPASSWORD);
+            if (mysqlPassword==null) mysqlPassword = PASSWORD;
 
             //STEP 3: Open a connection
             //Use PreparedStatement instead of Statement to prevent SQL injections
-            System.out.println("Connecting to a selected database...");
-            connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+            System.out.println("Connecting to DB:Host:"+mysqlHost+", UserID:"+mysqlUserID+", Password:"+mysqlPassword);
+            connection = DriverManager.getConnection(mysqlHost, mysqlUserID, mysqlPassword);
             System.out.println("Connected to database successfully...");
             Tools.setIsSQLUP("UP");
 

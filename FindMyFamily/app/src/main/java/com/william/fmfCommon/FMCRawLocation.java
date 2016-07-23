@@ -13,13 +13,15 @@ public class FMCRawLocation {
 	
 	private String mProvider="";
 	private long mTime=0;
+	private String formattedTime="";
 	private double mLatitude=0;
 	private double mLongitude=0;
 	private float mAccuracy=0;
 	private float mBearing=0;	
 	private float mSpeed=0;
 	//private int mNumOfSat=0;
-			
+	
+	private String originalLocationString="";
 	
 	public FMCRawLocation()
 	{}
@@ -31,24 +33,29 @@ public class FMCRawLocation {
 	
 	public boolean convertFromStringToObject(String locationString)
 	{
-        // network 2014/01/20 17:33:22 32.9759 -96.7204 1210 21 22
+       //Sample locationString: "network 2014/01/20 17:33:22 32.9759 -96.7204 1210 21 22"
        // String a = locationString.substring(locationString.indexOf("<")+1,locationString.indexOf(">"));
-        String[] result = locationString.split(" ");
+		
+		setOriginalLocationString(locationString);
+		
+		
+        String[] result = locationString.split(" "); //remove spaces ==> put into String array 
         System.out.println("location has elmements:"+result.length);
-        setProvider(result[0]);
+        setProvider(result[0]);	//set provider to be "network"
+        setTimeInDateFormat(result[1] + " " + result[2]);	//put the time received in a string format
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
 
         try {
-        	java.util.Date date = sdf.parse(result[1]+" "+result[2]);
-            setTime(date.getTime());
+        	java.util.Date date = sdf.parse(new String(result[1]+" "+result[2]));	//attempt to convert "2014/01/20 17:33:22" into a Date object
+            setTime(date.getTime());		//if successful, change time to be the time of the Date object 
         }
         catch (Exception e) {
-            setTime(0);
+        	
         }
         
-        setLatitude (Double.parseDouble(result[3]));
-        setLongitude(Double.parseDouble(result[4]));
-        setAccuracy(Float.parseFloat(result[5]));
+        setLatitude (Double.parseDouble(result[3]));	//set latitude = 32.9759
+        setLongitude(Double.parseDouble(result[4]));	//set longitude = -96.7204
+        setAccuracy(Float.parseFloat(result[5]));		//set accuracy = 1210
         if (result.length>=8)
         {
             setBearing(Float.parseFloat(result[6]));
@@ -113,6 +120,15 @@ public class FMCRawLocation {
 		return mTime;	
 	}
 	
+	public void setTimeInDateFormat( String time)
+	{
+		formattedTime = time;	
+	}	
+	public String getTimeInDateFormat()
+	{
+		return formattedTime;	
+	}
+	
 	public void setLatitude(double latitude)
 	{
 		mLatitude=latitude;		
@@ -156,6 +172,17 @@ public class FMCRawLocation {
 	public float getSpeed()
 	{
 		return mSpeed;		
+	}
+	
+	/*
+	 * This method was created in order bestLocation (inside FMCLocationData) to be able to get it's original string
+	 */
+	public String getOriginalLocationString(){
+		return originalLocationString;
+	}
+	
+	public void setOriginalLocationString(String s){
+		originalLocationString = s;
 	}
 	
 	public String toString()
