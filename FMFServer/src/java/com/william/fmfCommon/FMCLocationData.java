@@ -81,6 +81,86 @@ public class FMCLocationData{
     {
 
     }
+    
+    /*
+     * New constructor created to be able to help get stuff from the database
+     * Go ahead and do the wifi logic inside here
+     * Go ahead and also fill in fmpLocations[], bestlocation here as well
+     */
+    public FMCLocationData(String phone, String timeR, long timemillis, int battery, String charging, boolean mobiled,
+    		boolean gps, boolean network, String wifi, String best, String loc1, String loc2)
+    {
+    		//quickly fill out fields in here
+    		phoneNumber = phone;
+    		timeReceived = timeR;
+    		timeReceivedInMillis = timemillis;
+    		batteryLevel = battery;
+    		chargingMethod = charging;
+    		isMobileDataON = mobiled;
+    		isGPSON = gps;
+    		isNetworkON = network;
+    		
+    		//wifi stuff. Use same extraction method as composeObjectFromMessage
+    		//Example wifi: "WF:ENC <<Yeah5>>
+    		//Fill in variables wifiStatus, wifiAvailableSSIDs, connectedWifiSSID, fullWifiMessage="";
+    		fullWifiMessage = wifi;
+    		setWifiStatus(wifi.substring(wifi.indexOf(":")+1, wifi.indexOf(":")+4));
+            if (wifi.contains("<<"))
+            {
+                this.connectedWifiSSID = wifi.substring(wifi.indexOf("<<")+2, wifi.indexOf(">>"));
+                //Wifi SSID = wifi name
+                //Ex: connectedWifiSSID = Yeah5
+                
+            }
+            else if (wifi.contains("<"))
+            {
+                String a = wifi.substring(wifi.indexOf("<")+1, wifi.indexOf(">"));
+                this.wifiAvailableSSIDs = a.split(",");
+                //Wifi SSID = wife name
+                //Ex: Puts ATT88,ADF,WWFWE ==> String array of available WIFIs
+            }
+    		
+    		//location stuff. Just making FMCRawLocations and putting them inside the array
+    		bestLocation = new FMCRawLocation();
+    		bestLocation.convertFromStringToObject(best);
+    		
+    		//check if network or gps is null, cause they may be
+    		//idk if retrieval from SQL database will make it null or ""
+    		if(loc1 == null || loc2 == null){
+    			if(loc1 != null && loc2 == null){	//loc1 is good, loc2 isn't
+    				FMCRawLocation one = new FMCRawLocation();
+        			one.convertFromStringToObject(loc1);
+        			fMPLocations[0] = one;
+    			}
+    			else if(loc1 == null && loc2 == null){ //loc2 is good, loc1 isn't
+        			FMCRawLocation two = new FMCRawLocation();
+        			two.convertFromStringToObject(loc2);
+        			fMPLocations[1] = two;
+    			}
+    		}
+//    		if(loc1.equals("") || loc2.equals("")){
+//    			if(!loc1.equals("") && loc2.equals("")){	//loc1 is good, loc2 isn't
+//    				FMCRawLocation one = new FMCRawLocation();
+//        			one.convertFromStringToObject(loc1);
+//        			fMPLocations[0] = one;
+//    			}
+//    			else if(loc1.equals("") && !loc2.equals("")){ //loc2 is good, loc1 isn't
+//        			FMCRawLocation two = new FMCRawLocation();
+//        			two.convertFromStringToObject(loc2);
+//        			fMPLocations[1] = two;
+//    			}
+//    		}
+    		//both are good
+    		else{
+    			FMCRawLocation one = new FMCRawLocation();
+    			FMCRawLocation two = new FMCRawLocation();
+    			one.convertFromStringToObject(loc1);
+    			two.convertFromStringToObject(loc2);
+    			
+    			fMPLocations[0] = one;
+    			fMPLocations[1] = two;
+    		}
+    }
 
     //  Used to compose Outgoing Message from Object
     public String[] getMessageArrayFromObject(boolean singleMessage)
@@ -340,9 +420,11 @@ public class FMCLocationData{
                 	//extract the "network 2014/01/20 17:33:22 32.9759 -96.7204 1210" part out
                     String locationString = lines[i].substring(lines[i].indexOf("<")+1,lines[i].indexOf(">"));
                     System.out.println("locationString: " + locationString);
-                	location.convertFromStringToObject(locationString);    //fill location with data 
-                	setTimeReceived(location.getTimeInDateFormat());		//set time field (string) so MainOfficeHandler can use it
-                	setTimeReceivedInMillis(location.getTime());			//set time field in millis(long) so MainOfficeHandler can use it
+                    
+                	location.convertFromStringToObject(locationString);     		//fill location with data 
+                	setTimeReceived(location.getTimeInDateFormat());				//set time field (string) so MainOfficeHandler can use it
+                	setTimeReceivedInMillis(location.getTime());					//set time field in millis(long) so MainOfficeHandler can use it
+                	
                 	System.out.println("My location is "+location.getProvider());	//either "network" or "gps"
                     if (location.getProvider().equalsIgnoreCase(FMCRawLocation.LOCATION_GPS_STRING)){	//LOCATION_GPS_STRING = gps
                         fMPLocations[LOCATION_GPS] = location; //fMPLocations[0] = location; Add location into fMPLocations[0]
