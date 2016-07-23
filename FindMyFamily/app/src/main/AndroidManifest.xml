@@ -37,7 +37,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.william.findMyfamily.FMFMainScreen"
-            android:label="@string/app_name" >
+            android:label="@string/app_mainDisplay" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -50,7 +50,7 @@
         </activity>
 
         <receiver
-            android:name="com.william.findMyfamily.InfoReceiver"
+            android:name="com.william.findMyfamily.FMFSMSReceiver"
             android:enabled="true"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED" >
             <intent-filter android:priority="999" >

@@ -11,4 +11,6 @@ public interface FMFCallBackInterface {
 
     void postSimpleDialogBox(String asyncresult);
     void displayUserOnMap(String targetPhone, String locationInfo);
+    void handleClientListAllResponse(String asyncresult);
+    void handleGetServerStatusResponse(String asyncresult);
 }

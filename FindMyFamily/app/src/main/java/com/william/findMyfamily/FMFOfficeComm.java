@@ -105,11 +105,16 @@ public class FMFOfficeComm extends FMAOfficeCommunication{
 
             callback.postSimpleDialogBox(receivedMsg);  // Will be changed later
         }
+        else if (command.equals(FMCMessage.FMFOFFICE_CLIENTRESPONSE_LISTALL)) {
+            System.out.println(FMCMessage.FMFOFFICE_CLIENTRESPONSE_LISTALL);
+
+            callback.handleClientListAllResponse(receivedMsg);
+        }
 
         else if (command.equals(FMCMessage.FMFOFFICE_CLIENTRESPONSE_GETSERVERSTATUS)) {
             System.out.println(FMCMessage.FMFOFFICE_CLIENTRESPONSE_GETSERVERSTATUS);
 
-            callback.postSimpleDialogBox(receivedMsg);  // Will be changed later
+            callback.handleGetServerStatusResponse(receivedMsg);
 
         }
         else if (command.equals(FMCMessage.FMFOFFICE_CLIENTRESPONSE_GETLOG)) {

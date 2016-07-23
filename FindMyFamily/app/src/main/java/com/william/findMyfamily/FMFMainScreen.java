@@ -1165,9 +1165,7 @@ public class FMFMainScreen extends FragmentActivity  implements FMFCallBackInter
     }
 
     public void performListTargets() {
-        //  Tools.sendMessageThroughLAN("["+ FMFOfficeComm.FMFOFFICE_CLIENTLISTALL+"]");
         Tools.sendMessageThroughLAN("[" + FMCMessage.FMFOFFICE_CLIENTLISTALL + "]");
-        // Toast.makeText(this, "List Targets. Result will be available soon..", Toast.LENGTH_SHORT).show();
     }
 
     public void performDisplayLog() {
@@ -1335,6 +1333,44 @@ public class FMFMainScreen extends FragmentActivity  implements FMFCallBackInter
     public void postSimpleDialogBox(String asyncresult)
     {
         System.out.println("**** at postResult *****");
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage(asyncresult).setCancelable(true)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    public void handleClientListAllResponse(String asyncresult)
+    {
+        System.out.println("**** at handleClientListAllResponse *****");
+
+        // List Target, provide button to user menu
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage(asyncresult).setCancelable(true)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    public void handleGetServerStatusResponse(String asyncresult)
+    {
+        System.out.println("**** at handleGetServerStatusResponse *****");
+        // Display Server up day, SQL onOff, n. of targets
+        // Provide button to clean DB record for N days
+
+        // Read first line. Split it
+
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setMessage(asyncresult).setCancelable(true)
