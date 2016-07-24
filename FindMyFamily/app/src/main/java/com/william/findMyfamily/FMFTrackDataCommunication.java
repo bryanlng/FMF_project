@@ -22,9 +22,9 @@ public class FMFTrackDataCommunication extends AsyncTask <String, Void, String>{
 	protected String doInBackground(String... args) {
 		int argLength = args.length;
 
-		String url = "http://"+Tools.FMFTRACKSVAddr;
-		int serverPort = Tools.FMFTRACKSVPort;		
-		String urlString = new String (url+":"+serverPort+"/"+Tools.FMFTRACKRoute);
+		String url = "http://"+Tools.fmfServerAddr;
+		int serverPort = Tools.fmfServerPort;
+		String urlString = new String (url+":"+serverPort+"/"+Tools.fmfTrackRoute);
 
 		if (argLength==0)
 		{

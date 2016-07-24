@@ -25,9 +25,8 @@ public abstract class FMAOfficeCommunication {
 
     // Has to implement this method
     public abstract void  handleReceivedMessage(String receivedMsg);
-
     private FMATcpClient mTcpClient = null;
-    private String mHost="135.60.10.255";//"192.168.1.8";
+    private String mHost="wleungtx.no-ip.biz";//"192.168.1.8";
 
     private int mPort=8081;//23456;
     private String loginMessage=null;

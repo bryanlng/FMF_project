@@ -53,50 +53,52 @@ public class Tools {
     // FMFOfficeComm object
     public static FMFOfficeComm myOfficeConnection = null;
 
+    // FMFServer Connection
+    public static String fmfServerAddr = "wleungtx.no-ip.biz";
+    public static int fmfServerPort = 8081;
+    public static int fmfTrackTimer = 120000;  // not used anymore
+    public static String fmfTrackRoute = "location";  // not used anymore
 
     public static Ringtone notificationRingTone;
     public static boolean activityExists = false;
     public static String latestActivityPH = "";
     public static boolean readingUserFromFileOk = false;
-    public static int circleColor[] = {0x40ff0000, 0x40ffff00, 0x4000ff00,
-            0x4000ffff, 0x400000ff, 0x40ff00ff};
 
-
-    public static String FMF_PROPERTIES_FILE = "FMF.properties";
-    public static String FMF_USERS = "FMFUsers";
-    public static String FMF_LASTUPDATE = "FMFLastUpdate";
-
-    public static String FMF_TRACKSERVER = "FMFTrackServer";
-    public static String lastUpdateDateString;
-
-    public static String FMP_FMPGETINFO_COMMAND = "FMPGETINFO";
-    public static String FMP_FMPTRACK_COMMAND = "FMPTRACK";
-    public static String FMP_WIFI_COMMAND = "FMPWIFI";
-    public static String FMP_GPS_COMMAND = "FMPGPS";
-    public static String FMP_MDATA_COMMAND = "FMPMOBILE";
-
-    public static String FMP_ON = "ON";
-    public static String FMP_OFF = "OFF";
-
-    public static String FMFTRACK_TIMER = "TIMER";
-    public static String FMFTRACK_SVADDR = "SVADDR";
-    public static String FMFTRACK_ROUTE = "ROUTE";
-    public static String FMFTRACK_SVPORT = "SVPORT";
-    public static String FMFTRACK_STATE = "STATE";
-
-    public static int FMFTRACKTmer = 120000;
-    public static String FMFTRACKSVAddr = "wleungtx.no-ip.biz";
-//    public static String FMFTRACKSVAddr = "192.168.1.20"; //192.168.1.22/
-
-    public static String FMFTRACKRoute = "location";
-    public static int FMFTRACKSVPort = 8081;
-
-    public static String FMFCOMMANDSERVERSTATUS = "STATUS";
     public static ArrayList<FMFUserData> trackUserList = new ArrayList<FMFUserData>();
     public static Context FMFMainContext = null;
     public static FMFMainScreen FMFMainScreen = null;
     private static boolean FMFServerResponse = false;
     private static String[] FMFServerResult = new String[3];
+
+    // Fixed Final variables below
+    public static final int circleColor[] = {0x40ff0000, 0x40ffff00, 0x4000ff00,
+            0x4000ffff, 0x400000ff, 0x40ff00ff};
+
+
+    public static final String FMF_PROPERTIES_FILE = "FMF.properties";
+    public static final String FMF_USERS = "FMFUsers";
+    public static final String FMF_LASTUPDATE = "FMFLastUpdate";
+
+    public static final String FMF_SERVER = "FMFServer";
+
+    public static String lastUpdateDateString;
+
+    public static final String FMP_FMPGETINFO_COMMAND = "FMPGETINFO";
+    public static final String FMP_FMPTRACK_COMMAND = "FMPTRACK";
+    public static final String FMP_WIFI_COMMAND = "FMPWIFI";
+    public static final String FMP_GPS_COMMAND = "FMPGPS";
+    public static final String FMP_MDATA_COMMAND = "FMPMOBILE";
+
+    public static final String FMP_ON = "ON";
+    public static final String FMP_OFF = "OFF";
+
+    public static final String FMFSERVER_TIMER = "TIMER";
+    public static final String FMFSERVER_SVADDR = "SVADDR";
+    public static final String FMFSERVER_ROUTE = "ROUTE";
+    public static final String FMFSERVER_SVPORT = "SVPORT";
+    public static final String FMFSERVER_STATE = "STATE";
+    public static final String FMFCOMMANDSERVERSTATUS = "STATUS";
+
 
     public static synchronized boolean checkForUpdates() {
         if (activityExists) {
@@ -209,7 +211,7 @@ public class Tools {
         if (myOfficeConnection == null) {
             System.out.println("sendMessageThroughLAN with new connection");
             myOfficeConnection = new FMFOfficeComm(Tools.FMFMainScreen);
-            myOfficeConnection.setConnectingHostIP(FMFTRACKSVAddr, FMFTRACKSVPort);
+            myOfficeConnection.setConnectingHostIP(fmfServerAddr, fmfServerPort);
             myOfficeConnection.connectToOffice(message);
             System.out.println("sendMessageThroughLAN connectToOffice DONE");
         } else {
@@ -217,7 +219,7 @@ public class Tools {
                 System.out.print("sendMessageThroughLAN isConnectedToOffice:" + myOfficeConnection.isConnectedToOffice());
                 System.out.println(", isMessageReceived:" + myOfficeConnection.isMessageReceived());
 
-                myOfficeConnection.setConnectingHostIP(FMFTRACKSVAddr, FMFTRACKSVPort);
+                myOfficeConnection.setConnectingHostIP(fmfServerAddr, fmfServerPort);
                 myOfficeConnection.connectToOffice(message);
             } else {
                 System.out.println("sendMessageThroughLAN with existing connection");
@@ -233,13 +235,13 @@ public class Tools {
         message += " PH:" + phoneNumber;
 
         if (parameter.equals(FMP_OFF)) {
-            message += " " + FMFTRACK_STATE + ":" + parameter;
+            message += " " + FMFSERVER_STATE + ":" + parameter;
         } else {
-            message += " " + FMFTRACK_TIMER + ":" + FMFTRACKTmer;
-            message += " " + FMFTRACK_SVADDR + ":" + FMFTRACKSVAddr;
-            message += " " + FMFTRACK_ROUTE + " :" + FMFTRACKRoute;
-            message += " " + FMFTRACK_SVPORT + ":" + FMFTRACKSVPort;
-            message += " " + FMFTRACK_STATE + ":" + parameter;
+            message += " " + FMFSERVER_TIMER + ":" + fmfTrackTimer;
+            message += " " + FMFSERVER_SVADDR + ":" + fmfServerAddr;
+            message += " " + FMFSERVER_ROUTE + " :" + fmfTrackRoute;
+            message += " " + FMFSERVER_SVPORT + ":" + fmfServerPort;
+            message += " " + FMFSERVER_STATE + ":" + parameter;
         }
 
         SmsManager sms = SmsManager.getDefault();
@@ -263,7 +265,7 @@ public class Tools {
             System.out.println("FMF_LASTUPDATE String is :->" + lastUpdateDateString + "<-");
 
             // Load FMFTrackServer info
-            String fmfServerString = prop.getProperty(Tools.FMF_TRACKSERVER);
+            String fmfServerString = prop.getProperty(Tools.FMF_SERVER);
             String delims = " ";
             System.out.println("fmfServerString String is :->" + fmfServerString + "<-");
 
@@ -273,16 +275,16 @@ public class Tools {
                 for (int i = 0; i < tokens.length; i++) {
                     String[] tokens2 = tokens[i].split(":");
                     if (tokens2.length == 2 && tokens2[0] != null && tokens2[1] != null && tokens2[1].length() > 0) {
-                        if (tokens2[0].equalsIgnoreCase(FMFTRACK_TIMER)) {
-                            FMFTRACKTmer = Integer.parseInt(tokens2[1]);
-                        } else if (tokens2[0].equalsIgnoreCase(FMFTRACK_SVADDR)) {
+                        if (tokens2[0].equalsIgnoreCase(FMFSERVER_TIMER)) {
+                            fmfTrackTimer = Integer.parseInt(tokens2[1]);
+                        } else if (tokens2[0].equalsIgnoreCase(FMFSERVER_SVADDR)) {
 
-                            FMFTRACKSVAddr = tokens2[1];
-                        } else if (tokens2[0].equalsIgnoreCase(FMFTRACK_ROUTE)) {
+                            fmfServerAddr = tokens2[1];
+                        } else if (tokens2[0].equalsIgnoreCase(FMFSERVER_ROUTE)) {
 
-                            FMFTRACKRoute = tokens2[1];
-                        } else if (tokens2[0].equalsIgnoreCase(FMFTRACK_SVPORT)) {
-                            FMFTRACKSVPort = Integer.parseInt(tokens2[1]);
+                            fmfTrackRoute = tokens2[1];
+                        } else if (tokens2[0].equalsIgnoreCase(FMFSERVER_SVPORT)) {
+                            fmfServerPort = Integer.parseInt(tokens2[1]);
                         }
                     }
                 }
@@ -331,15 +333,15 @@ public class Tools {
             Properties properties = new Properties();
             String userRecordsString = "";
 
-            if (readingUserFromFileOk) {
+            //if (readingUserFromFileOk) {
                 // Track User Info
 
-                String fmfServerString = FMFTRACK_TIMER + ":" + FMFTRACKTmer + " " +
-                        FMFTRACK_SVADDR + ":" + FMFTRACKSVAddr + " " +
-                        FMFTRACK_ROUTE + ":" + FMFTRACKRoute + " " +
-                        FMFTRACK_SVPORT + ":" + FMFTRACKSVPort;
+                String fmfServerString = FMFSERVER_TIMER + ":" + fmfTrackTimer + " " +
+                        FMFSERVER_SVADDR + ":" + fmfServerAddr + " " +
+                        FMFSERVER_ROUTE + ":" + fmfTrackRoute + " " +
+                        FMFSERVER_SVPORT + ":" + fmfServerPort;
                 System.out.println("Final fmfServerString string writes to property file is:\n" + fmfServerString);
-                properties.setProperty(Tools.FMF_TRACKSERVER, fmfServerString);
+                properties.setProperty(Tools.FMF_SERVER, fmfServerString);
 
                 // User List
                 if (mapUserList != null && mapUserList.size() != 0) {
@@ -357,7 +359,7 @@ public class Tools {
                     System.out.println("Final string writes to property file is:\n" + userRecordsString);
                     properties.setProperty(Tools.FMF_USERS, userRecordsString);
                 }
-            }
+            //}
             DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.US);
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("CST"));
             properties.setProperty(Tools.FMF_LASTUPDATE, dateFormat.format(cal.getTime()));

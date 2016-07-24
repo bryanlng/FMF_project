@@ -25,8 +25,8 @@ public class Tools
 {
 
     public static String OS = "";
-    public static String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss EEE";
-    public static String DATE_FORMAT_DAYONLY = "yyyy-MM-dd";
+    public static String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss EEE";
+    public static String DATE_FORMAT_DAYONLY = "yyyy/MM/dd";
     public static int TIMEUPWARNING = 5;
     public static int KILLWARNING = 2;
 
@@ -73,7 +73,7 @@ public class Tools
     public static String sqlUp = "DOWN";
 
     /*
-     * Assumes that prevDayAndTime comes in format yyyy-mm-dd
+     * Assumes that prevDayAndTime comes in format yyyy/mm/dd
      */
     public static int compareDate(String prevDayAndTime){
         // First line is the date
@@ -93,10 +93,10 @@ public class Tools
 
         long diffDays = (todayMill - prevMill) / (24 * 60 * 60 * 1000);
 
-        System.out.println("today Refined day is yyyy-mm-dd:" +today.get(Calendar.YEAR) + "," +
+        System.out.println("today Refined day is yyyy/mm/dd:" +today.get(Calendar.YEAR) + "," +
                 (today.get(Calendar.MONTH)+1) + ","+
                 today.get(Calendar.DAY_OF_MONTH));
-        System.out.println("prev day is yyyy-mm-dd:" +(new Integer (prevDayAndTime.substring(0,4))).intValue() + "," +
+        System.out.println("prev day is yyyy/mm/dd:" +(new Integer (prevDayAndTime.substring(0,4))).intValue() + "," +
                 (new Integer (prevDayAndTime.substring(5,7))).intValue() + ","+
                 (new Integer (prevDayAndTime.substring(8,10))).intValue());
 

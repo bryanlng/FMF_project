@@ -12,8 +12,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Locale;
 
 import javax.net.ssl.SSLSocket;
+
 import java.sql.*;
 
 /*
@@ -57,7 +59,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 			while (!done) {
 				//gets the BufferedReader from the TCP superclass and reads the first line
 				String readString = getInReader().readLine();	
-				//Prints out the format: yyyy-MM-dd HH:mm:ss: MainOfficeHandler: readString is :readString
+				//Prints out the format: yyyy/MM/dd HH:mm:ss: MainOfficeHandler: readString is :readString
 				//where readstring = [TargetKAlive:0:+14696646540]
 				debugWrite("MainOfficeHandler: readString is :"+readString);
 
@@ -106,7 +108,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 
 					//getOutBufferedWriter() simply returns the BufferedWriter we got in setBuilders()
 					//write "ClientListAllResponse" to the BufferedWriter
-					getOutBufferedWriter().write(FMCMessage.FMFOFFICE_CLIENTRESPONSE_LISTALL+"\n");	//ClientListAllResponse
+					getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_LISTALL+"]\n");	//ClientListAllResponse
 
 					//gets list of all the keys in targetHT, the target list
 					//Aka, gets all the targets and put them in an Enumeration<String>
@@ -121,18 +123,19 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 						else
 						{
 							System.out.println("Current key: " + key);
+							MainOfficeTargetInfo targetInfo = MainOfficeServer.targetInfoListHT.get(key);
+
 							MainOfficeHandler val = MainOfficeServer.targetHT.get(key);
-							if (val == null)
-							{
-								continue;
-							}
+							String connectStatus =(val == null ? "NO":"YES");
+							System.out.println("connectStatus: " + connectStatus);
+
 
 							// Send back to Client
 							//FMFOFFICE_CLIENTRESPONSE_LISTALL
-							getOutBufferedWriter().write("["+key+":"+getTargetLoginTime() + ":"+getTargetLastKeepAlive()+"]\n");
+							getOutBufferedWriter().write("["+key+":"+connectStatus+":"+targetInfo.getLatestLocationUpdateTime()+"]\n");
 						}
 					}
-					getOutBufferedWriter().write(FMCMessage.FMFOFFICE_CLIENTRESPONSE_END+"\n");  //ClientResponseEnd
+					getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_END+"]\n");  //ClientResponseEnd
 					getOutBufferedWriter().flush();		//empty everything from the 
 				}
 				else if (command.equals(FMCMessage.FMFOFFICE_CLIENTCOMMAND)){	//ClientCmdEnd
@@ -298,7 +301,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 							//                    		else{
 							//Display time in days since the server started running (aka
 							//Display # of targets
-							//	                    		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+							//	                    		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 							//	                            String serverStartFormatted = dateFormat.format(Tools.getServerStart()); //Ex: 2014/08/06 15:59:48  
 							//                    			int daysUp = Tools.compareDate(serverStartFormatted);
 							int daysUp = (int)Tools.compareTimeInDays(System.currentTimeMillis());
@@ -381,6 +384,11 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 					debugWrite("FMFOFFICE_TARGETKEEPALIVE");
 					connectionType=TARGET_CONNECTION;
 					targetLastKeepAlive = getCurrentTime();
+					
+			        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.US);
+					Date date = sdf.parse(targetLastKeepAlive);
+                    long receivedTimeInMs = date.getTime();
+                    
 					userID = targetPhone;          
 					String retString = extraStringFromBF(
 							getInReader(),addCommandBracket(FMCMessage.FMFOFFICE_TARGETRESPONSE_END),null );
@@ -390,6 +398,12 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 					System.out.println("targetPhone: " + targetPhone);
 					FMCLocationData locationData = new FMCLocationData();
 					locationData.composeObjectFromMessage(retString, targetPhone);	//fill the FMPLocationData object with info from retString
+
+					// Use FMFServer receive time. Not the time recorded in phone
+					locationData.setTimeReceivedInMillis(receivedTimeInMs);
+					locationData.setTimeReceived(targetLastKeepAlive);
+
+					
 					System.out.println("Converted this record:"+locationData.getPhoneNumber()+" to Object printout:->"+locationData+"<-");
 					/**************************************************SQL Database integration HERE************************************
 					 * SQL Database integration HERE
@@ -441,14 +455,16 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 						MainOfficeServer.statement.setString(5, gps);
 						MainOfficeServer.statement.setString(6, network);
 						MainOfficeServer.statement.setString(7, locationData.getRawWifiMessage());
-
+ 
 						//printout so we can see what's going on
+						/*
 						getOutBufferedWriter().write("phoneNumber: " + locationData.getPhoneNumber() + 
 								", timeStamp: " + locationData.getTimeReceived() + 
 								", chargingMethod: " + locationData.getChargingMethod() + 
 								", mobileData: " + mobileData + ", gps: " + gps + 
 								", network: " + network + ", wifi: " + locationData.getRawWifiMessage());
 						getOutBufferedWriter().newLine();
+						*/
 						try{
 							rowsAffected = MainOfficeServer.statement.executeUpdate();
 						}
@@ -472,6 +488,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 							MainOfficeServer.statement.setString(6, locationData.getFMPLocation(1).getOriginalLocationString());	//loc 2 aka network
 							MainOfficeServer.statement.setInt(7, locationData.getBatteryLevel());	//battery level
 							//printout so we can see what's going on
+							/*
 							getOutBufferedWriter().write("phoneNumber: " + locationData.getPhoneNumber() + 
 									", TimeRecieved: " + locationData.getTimeReceived() + 
 									", TimeRecieved (millis): " + locationData.getTimeReceivedInMillis() + 
@@ -480,6 +497,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 									", Location_2: " + locationData.getFMPLocation(1).getOriginalLocationString() +
 									", BatteryLevel: " + locationData.getBatteryLevel());
 							getOutBufferedWriter().newLine();
+							*/
 							try{
 								rowsAffected = MainOfficeServer.statement.executeUpdate();
 							}
@@ -720,7 +738,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 
 
 	/*
-	 * Prints out current time in format yyyy-MM-dd HH:mm:ss from the DateFormat object
+	 * Prints out current time in format yyyy/MM/dd HH:mm:ss from the DateFormat object
 	 */
 	public void debugWrite(String s)
 	{
@@ -761,7 +779,7 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 	 */
 	public String getCurrentTime()
 	{
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date date = new Date();
 		return dateFormat.format(date); //Ex: 2014/08/06 15:59:48  
 	}

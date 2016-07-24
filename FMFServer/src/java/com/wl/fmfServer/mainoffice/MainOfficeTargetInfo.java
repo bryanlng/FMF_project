@@ -25,9 +25,9 @@ public class MainOfficeTargetInfo {
     public void addLocation(String location)
     {
         // update latest time;
-    	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
-        latestLocationUpdateTime = dateFormat.format(date); //2014-08-22 15:59:48  
+        latestLocationUpdateTime = dateFormat.format(date); //2014/08/22 15:59:48  
         numbeOfLocationUpdates++;
         
         if (location.contains("gps") || location.contains("network") || location.contains("WF:ENC"))
@@ -117,9 +117,9 @@ public class MainOfficeTargetInfo {
     {
     	debugLog = debugString;
         // update lated time;
-    	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
-        debugLogTime = dateFormat.format(date); //2014-08-22 15:59:48  
+        debugLogTime = dateFormat.format(date); //2014/08/22 15:59:48  
     	    	    
     }
     

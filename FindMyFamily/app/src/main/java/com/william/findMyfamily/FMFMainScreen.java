@@ -1130,10 +1130,10 @@ public class FMFMainScreen extends FragmentActivity  implements FMFCallBackInter
         final EditText trackFreq = (EditText) commandDialogView.findViewById(R.id.trackFreqET);
         final FMFMainScreen myFMFMainScreen = this;
 
-        serverURL.setText(Tools.FMFTRACKSVAddr);
-        serverPort.setText(new String("" + Tools.FMFTRACKSVPort));
-        serverRoute.setText(Tools.FMFTRACKRoute);
-        trackFreq.setText(new String("" + Tools.FMFTRACKTmer));
+        serverURL.setText(Tools.fmfServerAddr);
+        serverPort.setText(new String("" + Tools.fmfServerPort));
+        serverRoute.setText(Tools.fmfTrackRoute);
+        trackFreq.setText(new String("" + Tools.fmfTrackTimer));
 
         builder.setView(commandDialogView)
                 // Add action buttons
@@ -1141,10 +1141,10 @@ public class FMFMainScreen extends FragmentActivity  implements FMFCallBackInter
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         // Save
-                        Tools.FMFTRACKSVAddr = serverURL.getText().toString();
-                        Tools.FMFTRACKSVPort = Integer.parseInt(serverPort.getText().toString());
-                        Tools.FMFTRACKRoute = serverRoute.getText().toString();
-                        Tools.FMFTRACKTmer = Integer.parseInt(trackFreq.getText().toString());
+                        Tools.fmfServerAddr = serverURL.getText().toString();
+                        Tools.fmfServerPort = Integer.parseInt(serverPort.getText().toString());
+                        Tools.fmfTrackRoute = serverRoute.getText().toString();
+                        Tools.fmfTrackTimer = Integer.parseInt(trackFreq.getText().toString());
                         Tools.saveCurrentMapUsersToPropertiesfile(FMFMainScreen.this);
                         // Now restart the FMFOfficeComm
                         Tools.myOfficeConnection.stopCommunication();
