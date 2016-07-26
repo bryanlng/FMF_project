@@ -33,9 +33,11 @@
 	<!-- Users Operation Strings  -->	
     <string name="C_UserMainText">Users Menu</string>
     <string name="C_Users">Users</string>
-    <string name="C_AddUser">Add User</string>    
-    	       
-	<!-- Send Commands Dialog -->    
+    <string name="C_AddUser">Add User</string>
+    <string name="C_GetHistory">Get History</string>
+
+
+    <!-- Send Commands Dialog -->
     <string name="C_SendCommand">Send Command</string>
     <string name="C_Cancel">Cancel</string>    
     <string name="C_OK">OK</string>  
@@ -51,8 +53,25 @@
 	<string name="C_SERVERPORT">Server Port</string>	
 	<string name="C_SERVERROUTE">Server Route</string>	
 	<string name="C_TRACKFREQ">Track Freq</string>	
-    <string name="C_Save">Save</string>	
-    
+    <string name="C_Save">Save</string>
+
+
+    <!--  Get History Dialog -->
+    <string name="C_HISTORYBEGIN">Begin Time</string>
+    <string name="C_HISTORYEND">End Time</string>
+    <string name="C_HISTORY_PROMPT">Choose a time range</string>
+    <string-array name="HISTORY_CHOICES">
+        <item>Last 30 minutes</item>
+        <item>Last hour</item>
+        <item>Last 2 hours</item>
+        <item>Last 4 hours</item>
+        <item>Last 12 hours</item>
+        <item>Last day</item>
+        <item>Lasy 2 days</item>
+    </string-array>
+    <string name="C_GetHistoryButton">Get History</string>
+
+
     <!--  Track Summary Dialog -->
     <string name="C_TrackSummaryText">Track Summary</string>	
     <string name="C_TRACKSUMMARY">Re-send</string>	    

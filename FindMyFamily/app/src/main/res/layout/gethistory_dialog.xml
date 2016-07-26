@@ -1,0 +1,163 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#DAE7EB">
+
+    <TextView style="@style/ButtonFont"
+        android:id="@+id/title"
+        android:layout_marginLeft="5dip"
+        android:layout_marginTop="5dip"
+        android:layout_height="35dp"
+        android:gravity="center"
+        android:layout_width="fill_parent"
+        android:text="@string/C_GetHistory"
+        android:layout_alignParentLeft="true">
+    </TextView>
+
+    <RadioGroup android:id="@+id/historyRadioChoice"
+        android:layout_width="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dip"
+        android:checkedButton="@+id/historyPresetRChoice"
+        android:layout_below="@+id/title" >
+    <RadioButton
+        android:id="@+id/historyPresetRChoice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"></RadioButton>
+    <RadioButton android:id="@+id/historyManualRChoice"
+        android:layout_marginTop="200dip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"></RadioButton>
+    </RadioGroup>
+
+    <Spinner android:id="@+id/historyFixedChoice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/title"
+        android:layout_toEndOf="@id/historyRadioChoice"
+        android:layout_marginRight="5dp"
+        android:entries="@array/HISTORY_CHOICES"
+        android:prompt="@string/C_HISTORY_PROMPT"/>
+
+    <TextView android:id="@+id/historyBegin"
+        style="@style/MediumButtonFont"
+        android:layout_width="120dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="40dip"
+        android:layout_toEndOf="@id/historyRadioChoice"
+        android:textColor="#0000FF"
+        android:text="@string/C_HISTORYBEGIN"
+        android:layout_below="@+id/historyFixedChoice" >
+    </TextView>
+
+    <EditText android:id="@+id/historyBeginDateET"
+        style="@style/MediumButtonFont"
+        android:layout_marginRight="10dip"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_toRightOf="@+id/historyRadioChoice"
+
+        android:layout_marginTop="10dip"
+        android:layout_below="@+id/historyBegin"
+        android:textColor="#0000FF"
+        android:layout_toStartOf="@+id/historyBeginDateButton">
+    </EditText>
+    <Button
+        android:id="@+id/historyBeginDateButton"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginRight="10dip"
+
+        android:text=".."
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/historyBeginDateET" />
+
+    <EditText android:id="@+id/historyBeginTimeET"
+        style="@style/MediumButtonFont"
+        android:layout_marginRight="10dip"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_toRightOf="@+id/historyRadioChoice"
+
+        android:layout_marginTop="5dip"
+        android:layout_below="@+id/historyBeginDateET"
+        android:textColor="#0000FF"
+        android:layout_toStartOf="@+id/historyBeginTimeButton">
+    </EditText>
+    <Button
+        android:id="@+id/historyBeginTimeButton"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginRight="10dip"
+
+        android:text=".."
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/historyBeginTimeET" />
+
+
+
+    <TextView android:id="@+id/historyEnd"
+        style="@style/MediumButtonFont"
+        android:layout_width="120dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="20dip"
+        android:layout_toEndOf="@id/historyRadioChoice"
+        android:textColor="#0000FF"
+        android:text="@string/C_HISTORYEND"
+        android:layout_below="@+id/historyBeginTimeET" >
+    </TextView>
+
+    <EditText android:id="@+id/historyEndDateET"
+        style="@style/MediumButtonFont"
+        android:layout_marginRight="10dip"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_toRightOf="@+id/historyRadioChoice"
+
+        android:layout_marginTop="10dip"
+        android:layout_below="@+id/historyEnd"
+        android:textColor="#0000FF"
+        android:layout_toStartOf="@+id/historyEndDateButton">
+    </EditText>
+    <Button
+        android:id="@+id/historyEndDateButton"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginRight="10dip"
+
+        android:text=".."
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/historyEndDateET" />
+
+    <EditText android:id="@+id/historyEndTimeET"
+        style="@style/MediumButtonFont"
+        android:layout_marginRight="10dip"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_toRightOf="@+id/historyRadioChoice"
+
+        android:layout_marginTop="5dip"
+        android:layout_below="@+id/historyEndDateET"
+        android:textColor="#0000FF"
+        android:layout_toStartOf="@+id/historyEndTimeButton">
+    </EditText>
+    <Button
+        android:id="@+id/historyEndTimeButton"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginRight="10dip"
+
+        android:text=".."
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/historyEndTimeET" />
+
+
+</RelativeLayout>

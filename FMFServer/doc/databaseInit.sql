@@ -17,7 +17,7 @@ Wifi VARCHAR(255)
 
 CREATE TABLE location_fields( 
 PhoneNumber VARCHAR(255), 
-DateTimeRecieved VARCHAR(255),
+DateTimeReceived VARCHAR(255),
 DateInMilliseconds BIGINT(100),
 BestLocation VARCHAR(255),
 Location_1 VARCHAR(255),

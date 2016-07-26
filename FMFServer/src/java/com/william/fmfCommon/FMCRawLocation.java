@@ -40,7 +40,7 @@ public class FMCRawLocation {
 		
 		
         String[] result = locationString.split(" "); //remove spaces ==> put into String array 
-        System.out.println("location has elmements:"+result.length);
+        // System.out.println("location has elmements:"+result.length);
         setProvider(result[0]);	//set provider to be "network"
         setTimeInDateFormat(result[1] + " " + result[2]);	//put the time received in a string format
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);

@@ -8,6 +8,7 @@ import com.william.fmAndroidCommon.FMAOfficeCommunication;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -26,8 +27,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import android.location.Location;
-import android.net.Uri;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.app.AlertDialog;
@@ -44,14 +46,18 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+
 
 /*
  FMFMainScreen: Main Screen
@@ -61,7 +67,6 @@ import android.widget.AdapterView.OnItemLongClickListener;
 public class FMFMainScreen extends FragmentActivity  implements FMFCallBackInterface{
 
     static Context mainContext;
-    static String snippetText;
     static int mapDisplayMode = GoogleMap.MAP_TYPE_NORMAL;
     static boolean mapTrafficMode = false;
     private Vibrator vibrator;
@@ -72,6 +77,28 @@ public class FMFMainScreen extends FragmentActivity  implements FMFCallBackInter
     private AlertDialog alertDialog;
 
     private FMFOfficeComm officeConnection = new FMFOfficeComm(this);
+
+    // This is for Get History Command
+    private Spinner historySpinner;
+    private int historyBeginYear;
+    private int historyBeginMonth;
+    private int historyBeginDay;
+    private int historyBeginHour;
+    private int historyBeginMinute;
+    private int historyEndYear;
+    private int historyEndMonth;
+    private int historyEndDay;
+    private int historyEndHour;
+    private int historyEndMinute;
+    private final int HISTORYDATEBEGINDCODE = 1000;
+    private final int HISTORYTIMEBEGINDCODE = 1001;
+    private final int HISTORYDATEENDDCODE = 1002;
+    private final int HISTORYTIMEENDDCODE = 1003;
+    EditText hBeginDate;
+    EditText hBeginTime;
+    EditText hEndDate;
+    EditText hEndTime;
+
     /*
      * Initializations
      */
@@ -834,14 +861,14 @@ public class FMFMainScreen extends FragmentActivity  implements FMFCallBackInter
     }
 
     public void usersSelectionFunction(int itemIndex) {
-//      CharSequence[] items = {"Display my location on Map",
-//              "Latest Location Information", "Display Track Result",  "Find me", "Send Phone Commands",
-//              "Remove me from Map", "Delete", "Move Up", "Move Down"};
+//        CharSequence[] items = {"Display my location on Map",
+//                "Latest Location Information", "Find me (LAN)", "Display Last 10 locations", "FMP log",
+//                "Remove me from Map", "Delete", "Move Up", "Move Down",
+//                "Find me (SMS)", "Send Phone Commands", "Display Track Result"};
         CharSequence[] items = {"Display my location on Map",
-                "Latest Location Information", "Find me (LAN)", "Display Last 10 locations", "FMP log",
+                "Latest Location Information", "Find me (LAN)", "Location History",
                 "Remove me from Map", "Delete", "Move Up", "Move Down",
-                "Find me (SMS)", "Send Phone Commands", "Display Track Result"};
-
+                "Find me (SMS)", "Send Phone Commands"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final FMFUserData fMapData = Tools.mapUserList.get(itemIndex);
         final int itemFIndex = itemIndex;
@@ -876,30 +903,30 @@ public class FMFMainScreen extends FragmentActivity  implements FMFCallBackInter
                         break;
 
                     case 3:  // Display Last 10 locations
-                        // displayLocationHistoryOperation(itemFIndex);
+                        displayLocationHistoryOperation(itemFIndex);
                         break;
 
-                    case 4:  // FMP log
+//                    case 4:  // FMP log
                         // fMPLogOperation(itemFIndex);
-                        break;
+//                        break;
 
 
-                    case 5:  // Remove From Map
+                    case 4:  // Remove From Map
                         fMapData.removeFromMap();
                         break;
 
-                    case 6:  // delete
+                    case 5:  // delete
                         performItemDelete(fMapData);
                         break;
 
-                    case 7:  // Move Up
+                    case 6:  // Move Up
                         if (item != 0) {
                             Tools.mapUserList.add(itemFIndex - 1, fMapData);
                             Tools.mapUserList.remove(itemFIndex + 1); // old position
                             Tools.saveCurrentMapUsersToPropertiesfile(mainContext);
                         }
                         break;
-                    case 8:  // Move Down
+                    case 7:  // Move Down
 
                         if (item != Tools.mapUserList.size() - 1) {
                             Tools.mapUserList.remove(itemFIndex);
@@ -908,18 +935,18 @@ public class FMFMainScreen extends FragmentActivity  implements FMFCallBackInter
                         }
                         break;
 
-                    case 9:  // Find me (SMS)
+                    case 8:  // Find me (SMS)
                         findUsersOperation(itemFIndex);
                         break;
 //
-                    case 10:  // Commands
+                    case 9:  // Commands
                         commandOperation(itemFIndex);
                         break;
-
+/*
                     case 11:  //  Display track result.  Not used anymore
                         displayTrackResult(itemFIndex);
                         break;
-
+*/
                 }
             }
         });
@@ -1299,6 +1326,273 @@ public class FMFMainScreen extends FragmentActivity  implements FMFCallBackInter
         });    */
     }
 
+    // Below are methods to implement displayLocationHistory
+    private void displayLocationHistoryOperation(int itemIndex) {
+        // Have a dialog box showing existing server connection values
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // Get the layout inflater
+        LayoutInflater inflater = this.getLayoutInflater();
+        View historyDialogView = inflater.inflate(R.layout.gethistory_dialog, null);
+        historySpinner = (Spinner) historyDialogView.findViewById(R.id.historyFixedChoice);
+        //historySpinner.setOnItemSelectedListener(new CustomOnItemSelectedListener());
+
+        final int fItemIndex = itemIndex;
+        int spinnerSelectedPos=0;
+
+        historySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
+                Toast.makeText(parent.getContext(),
+                        "OnItemSelectedListener : " + parent.getItemAtPosition(pos).toString(),
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+            }
+
+        });
+
+        // Initialize time/date
+        final Calendar c = Calendar.getInstance();
+        historyBeginYear = c.get(Calendar.YEAR);
+        historyBeginMonth = c.get(Calendar.MONTH);
+        historyBeginDay = c.get(Calendar.DAY_OF_MONTH);
+        historyBeginHour = c.get(Calendar.HOUR);
+        historyBeginMinute = c.get(Calendar.MINUTE);
+
+        historyEndYear = historyBeginYear;
+        historyEndMonth = historyBeginMonth;
+        historyEndDay = historyBeginDay;
+        historyEndHour = historyBeginHour;
+        historyEndMinute = historyBeginMinute;
+
+
+        hBeginDate = (EditText) historyDialogView.findViewById(R.id.historyBeginDateET);
+        hBeginTime = (EditText) historyDialogView.findViewById(R.id.historyBeginTimeET);
+        hEndDate = (EditText) historyDialogView.findViewById(R.id.historyEndDateET);
+        hEndTime = (EditText) historyDialogView.findViewById(R.id.historyEndTimeET);
+
+        final Button historyBeginDateButton = (Button) historyDialogView.findViewById(R.id.historyBeginDateButton);
+        final Button historyBeginTimeButton = (Button) historyDialogView.findViewById(R.id.historyBeginTimeButton);
+        final Button historyEndDateButton = (Button) historyDialogView.findViewById(R.id.historyEndDateButton);
+        final Button historyEndTimeButton = (Button) historyDialogView.findViewById(R.id.historyEndTimeButton);
+
+        // Set radio buttons
+        final RadioGroup historyRadioGroupId = (RadioGroup) historyDialogView.findViewById(R.id.historyRadioChoice);
+        historyRadioGroupId.check(R.id.historyFixedChoice);
+
+        historyRadioGroupId.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // find which radio button is selected
+                if(checkedId == R.id.historyPresetRChoice) {
+                    Toast.makeText(getApplicationContext(), "choice: historyPresetRChoice",
+                            Toast.LENGTH_SHORT).show();
+                    // Enable Spinner
+                    historySpinner.setEnabled(true);
+                    // Disable date/time, buttons
+                    hBeginDate.setEnabled(false);
+                    hBeginTime.setEnabled(false);
+                    hEndDate.setEnabled(false);
+                    hEndTime.setEnabled(false);
+                    historyBeginDateButton.setEnabled(false);
+                    historyBeginTimeButton.setEnabled(false);
+                    historyEndDateButton.setEnabled(false);
+                    historyEndTimeButton.setEnabled(false);
+                } else if(checkedId == R.id.historyManualRChoice) {
+                    Toast.makeText(getApplicationContext(), "choice: historyManualRChoice",
+                            Toast.LENGTH_SHORT).show();
+                    // Disable Spinner
+                    historySpinner.setEnabled(false);
+                    // Enable date/time, buttons
+                    hBeginDate.setEnabled(true);
+                    hBeginTime.setEnabled(true);
+                    hEndDate.setEnabled(true);
+                    hEndTime.setEnabled(true);
+                    historyBeginDateButton.setEnabled(true);
+                    historyBeginTimeButton.setEnabled(true);
+                    historyEndDateButton.setEnabled(true);
+                    historyEndTimeButton.setEnabled(true);
+                }
+            }
+
+        });
+
+        hBeginDate.setText(historyBeginYear+"/"+(historyBeginMonth+1)+"/"+historyBeginDay);
+        hBeginTime.setText(historyBeginHour+":"+historyBeginMinute);
+        hEndDate.setText(historyEndYear+"/"+(historyEndMonth+1)+"/"+historyEndDay);
+        hEndTime.setText(historyEndHour+":"+historyEndMinute);;
+
+
+        historyBeginDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            @Deprecated
+            public void onClick(View v) {
+                System.out.println("clicked historyBeginDateButton");
+                showDialog(HISTORYDATEBEGINDCODE);
+            }
+        });
+        historyBeginTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            @Deprecated
+            public void onClick(View v) {
+                System.out.println("clicked historyBeginTimeButton");
+                showDialog(HISTORYTIMEBEGINDCODE);
+            }
+        });
+        historyEndDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            @Deprecated
+            public void onClick(View v) {
+                System.out.println("clicked historyBeginDateButton");
+                showDialog(HISTORYDATEENDDCODE);
+            }
+        });
+        historyEndTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            @Deprecated
+            public void onClick(View v) {
+                System.out.println("clicked historyEndTimeButton");
+                showDialog(HISTORYTIMEENDDCODE);
+            }
+        });
+
+        builder.setView(historyDialogView)
+                // Add action buttons
+                .setPositiveButton(R.string.C_GetHistoryButton, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Get History
+                        System.out.println("displayLocationHistoryOperation clicked C_GetHistoryButton");
+                        // Find Begin time, and end time
+                        long endTime= (new Date()).getTime();
+                        long beginTime = endTime - 5 * 60 * 1000 ; // 5 minute before
+                        if (historyRadioGroupId.getCheckedRadioButtonId() == R.id.historyPresetRChoice)
+                        {
+                            // if use fixed interval
+                            beginTime = getBeginTimeFromFixedChoice(endTime,historySpinner.getSelectedItemPosition());
+                        }
+                        else  // use manual interval
+                        {
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US);
+                            try {
+                                Date beginDate = dateFormat.parse(hBeginDate.getText()+ " " + hBeginTime.getText());
+                                Date endDate = dateFormat.parse(hEndDate.getText()+ " " + hEndTime.getText());
+                                beginTime = beginDate.getTime();
+                                endTime = endDate.getTime();
+                            }
+                            catch (Exception e)
+                            {
+                                System.out.println("parsing date/time failed"+ e.getMessage());
+                            }
+                        }
+                        // Use manual set time
+                        String remotePhoneNumber="";
+                        if (fItemIndex != -1) {
+                            remotePhoneNumber = Tools.mapUserList.get(fItemIndex).getFmpLocationData().getPhoneNumber();
+                        }
+                        String message = "[" + FMCMessage.FMFOFFICE_CLIENTGETHISTORYFROMDB + ":" + Tools.getMyPhoneNumber() + ":"+ remotePhoneNumber+":"+beginTime+","+endTime+",10]";
+                        Tools.sendMessageThroughLAN(message);
+                    }
+                })
+                .setNegativeButton(R.string.C_Cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Cancel
+                    }
+                });
+
+        //AlertDialog alert = builder.create();
+        //alert.show();
+        alertDialog = builder.create();
+        alertDialog.show();
+
+
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
+        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm", Locale.US);
+
+        switch (id) {
+            case HISTORYDATEBEGINDCODE:
+                return new DatePickerDialog(alertDialog.getContext(), beginDatePickerListener,
+                        historyBeginYear, historyBeginMonth, historyBeginDay);
+
+            case HISTORYTIMEBEGINDCODE:
+                return new TimePickerDialog(alertDialog.getContext(), beginTimePickerListener,
+                        historyBeginHour, historyBeginMinute,false);
+
+            case HISTORYDATEENDDCODE:
+                return new DatePickerDialog(alertDialog.getContext(), endDatePickerListener,
+                        historyEndYear, historyEndMonth, historyEndDay);
+
+            case HISTORYTIMEENDDCODE:
+                return new TimePickerDialog(alertDialog.getContext(), endTimePickerListener,
+                        historyEndHour, historyEndMinute,false);
+        }
+        return null;
+    }
+
+    private DatePickerDialog.OnDateSetListener beginDatePickerListener
+            = new DatePickerDialog.OnDateSetListener() {
+
+        // when dialog box is closed, below method will be called.
+        public void onDateSet(DatePicker view, int selectedYear,
+                              int selectedMonth, int selectedDay) {
+            System.out.println("beginDatePickerListener.OnDateSetListener:"+ selectedYear+","+selectedMonth+"'"+selectedDay);
+            hBeginDate.setText(selectedYear+"/"+(selectedMonth+1)+"/"+selectedDay);
+            historyBeginYear=selectedYear;
+            historyBeginMonth=selectedMonth;
+            historyBeginDay = selectedDay;
+        }
+    };
+
+    private TimePickerDialog.OnTimeSetListener beginTimePickerListener
+            = new TimePickerDialog.OnTimeSetListener() {
+
+        // when dialog box is closed, below method will be called.
+        public void onTimeSet(TimePicker view, int selectedHour,
+                              int selectedMinute) {
+           // int day = selectedDay;
+            System.out.println("beginTimePickerListener.OnTimeSetListener:"+ selectedHour+","+selectedMinute+"'");
+            hBeginTime.setText(selectedHour+":"+selectedMinute);
+            historyBeginHour=selectedHour;
+            historyBeginMinute=selectedMinute;
+        }
+    };
+
+    private DatePickerDialog.OnDateSetListener endDatePickerListener
+            = new DatePickerDialog.OnDateSetListener() {
+
+        // when dialog box is closed, below method will be called.
+        public void onDateSet(DatePicker view, int selectedYear,
+                              int selectedMonth, int selectedDay) {
+            System.out.println("endDatePickerListener.OnDateSetListener:"+ selectedYear+","+selectedMonth+"'"+selectedDay);
+            hEndDate.setText(selectedYear+"/"+(selectedMonth+1)+"/"+selectedDay);
+            historyEndYear=selectedYear;
+            historyEndMonth=selectedMonth;
+            historyEndDay = selectedDay;
+        }
+    };
+
+    private TimePickerDialog.OnTimeSetListener endTimePickerListener
+            = new TimePickerDialog.OnTimeSetListener() {
+
+        // when dialog box is closed, below method will be called.
+        public void onTimeSet(TimePicker view, int selectedHour,
+                              int selectedMinute) {
+            // int day = selectedDay;
+            System.out.println("endTimePickerListener.OnTimeSetListener:"+ selectedHour+","+selectedMinute+"'");
+            hEndTime.setText(selectedHour+":"+selectedMinute);
+            historyEndHour=selectedHour;
+            historyEndMinute=selectedMinute;
+        }
+    };
+
 
     // Delete a target user
     private void performItemDelete(FMFUserData fmData) {
@@ -1418,5 +1712,46 @@ public class FMFMainScreen extends FragmentActivity  implements FMFCallBackInter
         return retString;
     }
 
+    private long getBeginTimeFromFixedChoice(long endTime, int pos) {
+
+        long beginTime = endTime;
+
+    /*
+        <item>Last 30 minutes</item>
+        <item>Last hour</item>
+        <item>Last 2 hours</item>
+        <item>Last 4 hours</item>
+        <item>Last 12 hours</item>
+        <item>Last day</item>
+        <item>Lasy 2 days</item>
+     */
+        switch (pos) {
+            case (0):  // 30 minutes
+                beginTime = endTime - (30 * 60 * 1000);
+                break;
+            case (1):  // 1 hour
+                beginTime = endTime - (60 * 60 * 1000);
+                break;
+            case (2):  // 2 hours
+                beginTime = endTime - (2 * 60 * 60 * 1000);
+                break;
+            case (3):  // 4 hours
+                beginTime = endTime - (4 * 60 * 60 * 1000);
+                break;
+            case (4):  // 12 hours
+                beginTime = endTime - (12 * 60 * 60 * 1000);
+                break;
+            case (5):  // 1 day
+                beginTime = endTime - (24 * 60 * 60 * 1000);
+                break;
+            case (6):  // 2 days
+                beginTime = endTime - (2 * 24 * 60 * 60 * 1000);
+                break;
+            default:
+                break;
+
+        }
+        return beginTime;
+    }
 
 }

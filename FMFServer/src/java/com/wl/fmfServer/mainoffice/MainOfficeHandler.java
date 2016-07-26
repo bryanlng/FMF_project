@@ -77,7 +77,15 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 				String command=null;
 				String clientPhone = "X";		//Phone that has FMF on it
 				String targetPhone = "Y";       //Phone that has FindMyPhone on it
-				if (tokens.length == 3)
+				String parameter = "P";         //Comamnd that has parameters to follow
+				if (tokens.length == 4)
+				{
+					command = tokens[0];		//command = TargetKAlive
+					clientPhone = tokens[1];	//clientPhone = 0
+					targetPhone = tokens[2]; 	//targetPhone = +14696646540
+					parameter   = tokens[3];
+				}  				
+				else if (tokens.length == 3)
 				{
 					command = tokens[0];		//command = TargetKAlive
 					clientPhone = tokens[1];	//clientPhone = 0
@@ -184,23 +192,34 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 				else if (command.equals(FMCMessage.FMFOFFICE_CLIENTGETHISTORYFROMDB)){
 					connectionType=CLIENT_CONNECTION;
 					userID = clientPhone; 
-					// Format: [ClientGetHistoryFromDB:#,begin,end,numLocations]
-					// At the beginning, it is already extracted so that command = CleanUpDB, clientPhone = "#,begin,end,numLocations"
+					// Format: [ClientGetHistoryFromDB:ClientPhone:TargetPhone:begin,end,numLocations]
+					// At the beginning, it is already extracted so that command = CleanUpDB, clientPhone = "begin,end,numLocations"
 					// Thus, all we have to do is break up the huge clientPhone string into parts
-					String[] stuff = clientPhone.split(",");
+					if (parameter == null || parameter.length() ==0)
+					{
+						debugWrite("FMFOFFICE_CLIENTGETHISTORYFROMDB. Parameter NOT exist:");
+						return;
+					}
+					String[] stuff = parameter.split(",");
 
 					SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY/MM/dd HH:mm:ss");	//so string split ":" doesn't mess up if we did HH:mm:ss
-					String number = stuff[0];
-					Date begin = new Date(Long.parseLong(stuff[1]));
-					Date end = new Date(Long.parseLong(stuff[2]));
-					int numlocs = Integer.parseInt(stuff[3]);
+					//String number = stuff[0];
+					Date begin = new Date(Long.parseLong(stuff[0]));
+					Date end = new Date(Long.parseLong(stuff[1]));
+					int numlocs = Integer.parseInt(stuff[2]);
 
-					debugWrite("FMFOFFICE_CLIENTGETHISTORYFROMDB. number: " + number + ", begin time: " + stuff[1]
-							+  ", end time: " + stuff[2] + ", numlocs: " + numlocs);
+					debugWrite("FMFOFFICE_CLIENTGETHISTORYFROMDB. number: " + targetPhone + ", begin time: " + begin
+							+  ", end time: " + end + ", numlocs: " + numlocs);
 					getOutBufferedWriter().write("["+FMCMessage.FMFOFFICE_CLIENTRESPONSE_OK+":"+clientPhone+":"+targetPhone+"]");
 					getOutBufferedWriter().newLine();
 
-					FMCLocationData[] locations = MainOfficeDB.getInstance().getLocationsBetweenTimes(number, begin, end, numlocs);	
+					FMCLocationData[] locations = MainOfficeDB.getInstance().getLocationsBetweenTimes(targetPhone, begin, end, numlocs);	
+					
+					// Return to client
+					if (locations == null)
+					    System.out.println("No. of locations returned : 0");
+					else 
+						System.out.println("No. of locations returned : " + locations.length);
 
 
 					getOutBufferedWriter().newLine();                        

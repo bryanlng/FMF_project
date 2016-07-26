@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import com.william.fmfCommon.FMCLocationData;
 
@@ -93,7 +94,7 @@ public class MainOfficeDB {
 		else{
 			long timeRightNow = System.currentTimeMillis();
 			long nthday = timeRightNow - (numDaysOld*86400000);     //86400000 = # milliseconds per day. ,
-			System.out.println("Deleting rows from location_fields where DateInMilliseconds >= " + nthday);
+			System.out.println("Deleting rows for "+numDaysOld + " days old. Millisec: >= " + nthday);
 
 			try{
 				int rowsAffected = 0;   //field required for executeUpdate(), which works with DELETE statements
@@ -106,6 +107,7 @@ public class MainOfficeDB {
 				//printout so we can see what's going on
 				try{
 					rowsAffected = statement.executeUpdate();
+					System.out.println("Deleted rows from non_location_fields table:"+rowsAffected);
 				}
 				catch(SQLException se1){
 					se1.printStackTrace();
@@ -120,6 +122,8 @@ public class MainOfficeDB {
 				//printout so we can see what's going on
 				try{
 					rowsAffected = statement.executeUpdate();
+					System.out.println("Deleted rows from location_fields table:"+rowsAffected);
+
 				}
 				catch(SQLException se1){
 					se1.printStackTrace();
@@ -184,7 +188,7 @@ public class MainOfficeDB {
 			statement.setLong(3, endTime);
 
 			//printout so we can see what's going on
-			SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY/MM/DD HH:MM:SS");
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.US);
 			System.out.println("Finding # of rows from location_fields during time period: "
 					+ dateFormat.format(begin) + " - " + dateFormat.format(end));
 
@@ -192,10 +196,21 @@ public class MainOfficeDB {
 
 			int locationsExtracted = 0; //# of FMCLocationData objects actually found in the database
 			if(resultSet.next()){   //if current row is valid, then extract
-				locationsExtracted = resultSet.getInt("COUNT(PhoneNumber)");
+				locationsExtracted = resultSet.getInt("COUNT(PhoneNumber)");		
+				if (locationsExtracted > 0)
+				{
+					System.out.println("Found "+locationsExtracted + " items");
+				}
+				else 				
+				{
+					System.out.println("Found no items");
+					return null;
+				}
 			}
-			else{
-
+			else 
+			{
+				System.out.println("Found no items");
+				return null;				
 			}
 
 
@@ -299,6 +314,7 @@ public class MainOfficeDB {
 			 *
 			 */
 
+			System.out.println("User asked for "+numLocations+" locations.  Extracted "+locationsExtracted+" locations");
 			if( numLocations >= locationsExtracted){
 				for(int i = 0; i < locationsExtracted; i++){
 					locations[i] = allLocations[i];
@@ -317,7 +333,11 @@ public class MainOfficeDB {
                     Return 10 evenly spaced (in terms of time) locations, or the closest possible*/
 					int average = locationsExtracted / numLocations;    //this will truncate so we can get a somewhat even distribution
 					int locationIndex = 0;
-					for(int k = 0; k < locationsExtracted; k += average){
+					System.out.println("User asked for "+numLocations+" locations.  Extracted "+locationsExtracted+" locations"+ ". Average is "+average);
+
+					for(int k = 0; k < numLocations; k += average){
+						System.out.println("Working on location Index "+locationIndex+", k is "+k);
+
 						locations[locationIndex] = allLocations[k];
 						locationIndex++;
 					}
@@ -327,8 +347,13 @@ public class MainOfficeDB {
 		catch(SQLException se){
 			se.printStackTrace();
 		}
+		catch (Exception ee)
+		{
+			System.out.println("Got other exceptins in getLocationsBetweenTimes:"+ee.getMessage());
+		}
 
 
+		
 		return locations;
 
 

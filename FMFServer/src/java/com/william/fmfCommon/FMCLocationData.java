@@ -315,9 +315,9 @@ public class FMCLocationData{
                 messagesReceived = new String[size];	//make messagesRecieved by the size of that array
                 System.out.println("New Size is "+size);
             }
-            System.out.println("*****************************");
-            System.out.println("Input String is now:"+inputString+"\nSize is "+messagesReceived.length);
-            System.out.println("*****************************");
+            //System.out.println("*****************************");
+            //System.out.println("Input String is now:"+inputString+"\nSize is "+messagesReceived.length);
+            //System.out.println("*****************************");
  
             //Get the 1st number of [FMPRSP:0 0] in inputString, which is actually retString
             int msgIndex = Integer.parseInt(inputString.substring(inputString.indexOf(":")+1, inputString.indexOf(" ")));
@@ -344,7 +344,7 @@ public class FMCLocationData{
             }
 
             // All the message array has been filled up.
-            System.out.println("Full Message length "+fullMessage.length()+" is->"+ fullMessage);
+            // System.out.println("Full Message length "+fullMessage.length()+" is->"+ fullMessage);
 
             /*
              * [FMPRSP:0 9]
@@ -425,7 +425,7 @@ public class FMCLocationData{
                 	setTimeReceived(location.getTimeInDateFormat());				//set time field (string) so MainOfficeHandler can use it
                 	setTimeReceivedInMillis(location.getTime());					//set time field in millis(long) so MainOfficeHandler can use it
                 	
-                	System.out.println("My location is "+location.getProvider());	//either "network" or "gps"
+                	// System.out.println("My location is "+location.getProvider());	//either "network" or "gps"
                     if (location.getProvider().equalsIgnoreCase(FMCRawLocation.LOCATION_GPS_STRING)){	//LOCATION_GPS_STRING = gps
                         fMPLocations[LOCATION_GPS] = location; //fMPLocations[0] = location; Add location into fMPLocations[0]
                     }
@@ -493,7 +493,7 @@ public class FMCLocationData{
             if (bestLocation != null)
                 System.out.println("Best Provider is "+bestLocation.getProvider());
 
-            System.out.println("Finish composeObjectFromString: completed");
+            // System.out.println("Finish composeObjectFromString: completed");
             messagesReceived = null;
             messageDecodeCompleted=true;
 
