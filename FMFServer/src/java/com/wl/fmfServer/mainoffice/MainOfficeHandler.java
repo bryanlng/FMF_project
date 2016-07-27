@@ -78,12 +78,14 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 				String clientPhone = "X";		//Phone that has FMF on it
 				String targetPhone = "Y";       //Phone that has FindMyPhone on it
 				String parameter = "P";         //Comamnd that has parameters to follow
-				if (tokens.length == 4)
+
+				if (tokens.length == 4)			//Used exclusively for the TargetKAlive command
 				{
 					command = tokens[0];		//command = TargetKAlive
 					clientPhone = tokens[1];	//clientPhone = 0
 					targetPhone = tokens[2]; 	//targetPhone = +14696646540
 					parameter   = tokens[3];
+					System.out.println("parameter: " + parameter);
 				}  				
 				else if (tokens.length == 3)
 				{
@@ -214,12 +216,22 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 					getOutBufferedWriter().newLine();
 
 					FMCLocationData[] locations = MainOfficeDB.getInstance().getLocationsBetweenTimes(targetPhone, begin, end, numlocs);	
-					
+
 					// Return to client
 					if (locations == null)
-					    System.out.println("No. of locations returned : 0");
-					else 
+						System.out.println("No. of locations returned : 0");
+					else{
 						System.out.println("No. of locations returned : " + locations.length);
+						//Printout of each FMCLocationData object for correctness
+						for(int i = 0; i < locations.length; i++){
+							System.out.println("Location " + i);
+							FMCLocationData temp = locations[i];
+							System.out.println("	Number: " + temp.getPhoneNumber());
+							System.out.println("	DateTimeReceived: " + temp.getTimeReceived());
+							System.out.println("	DateInMilliseconds: " + temp.getTimeReceivedInMillis());
+						}
+					}
+
 
 
 					getOutBufferedWriter().newLine();                        
@@ -402,11 +414,11 @@ public class MainOfficeHandler  extends TcpDataCommunication implements Runnable
 					debugWrite("FMFOFFICE_TARGETKEEPALIVE");
 					connectionType=TARGET_CONNECTION;
 					targetLastKeepAlive = getCurrentTime();
-					
-			        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.US);
+
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.US);
 					Date date = sdf.parse(targetLastKeepAlive);
-                    long receivedTimeInMs = date.getTime();
-                    
+					long receivedTimeInMs = date.getTime();
+
 					userID = targetPhone;          
 					String retString = extraStringFromBF(
 							getInReader(),addCommandBracket(FMCMessage.FMFOFFICE_TARGETRESPONSE_END),null );

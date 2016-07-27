@@ -22,5 +22,5 @@ DateInMilliseconds BIGINT(100),
 BestLocation VARCHAR(255),
 Location_1 VARCHAR(255),
 Location_2 VARCHAR(255),
-BatteryLevel INT(3) 
+BatteryLevel INT(100) 
 );
