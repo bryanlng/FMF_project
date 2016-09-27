@@ -1,0 +1,97 @@
+Message from Target (FindMyPhone) to Server (FindMyServer)
+
+// [TargetKAlive:0:+14696646540] is readString
+
+[TargetKAlive:0:+14696646540]
+[FMPRSP:0 0]
+PH:
+DE:
+BA:99
+CH:AC
+MD:OFF
+GP:ON
+NW:ON
+TK:OFF
+LOC:1 <gps 2015/10/16 07:14:27 33.0738 -96.7236 8 237 2 0>
+LOC:2 <network 2015/10/16 07:14:25 33.0740 -96.7235 24 0 0>
+WF:ENC <<Yeah5>>
+[TargetResponseEnd]
+
+[TargetKAlive:0:+12146824497]
+[FMPRSP:0 0]
+PH:
+DE:
+BA:99
+CH:AC
+MD:OFF
+GP:ON
+NW:ON
+TK:OFF
+LOC:1 <gps 2015/10/16 07:14:27 33.0738 -96.7236 8 237 2 0>
+LOC:2 <network 2015/10/16 07:14:25 33.0740 -96.7235 24 0 0>
+WF:ENC <<Yeah5>>
+[TargetResponseEnd]
+
+
+Abbreviations:
+1. PH:		Phone #
+2. DE:  	Date/ Time received. Generate this when the message is received using a system millisecond thing.
+3. BA:99 	Battery level (0-100)
+4. CH:   	Charging mode (AC, DC)
+5. MD:		Mobile data (on,off)
+6. GP:		GPS (on,off)
+7. NW:	 	Mobile network (on,off)
+8. TK:		-deprecated-
+9. IN:
+10.LOC:1 <gps 2015/10/16 07:14:27 33.0738 -96.7236 8 237 2 0>	
+12. LOC:2 <network 2015/10/16 07:14:25 33.0740 -96.7235 24 0 0>
+13. WF:ENC <<Yeah5>>
+
+Message from Client (FindMyFamily) to Server (FindMyServer)
+
+[ClientGetLatest:11111111:14696646540]
+
+[ClientGetAllHistory:11111111:4692370549]
+
+[ClientGetServerStatus:1111111111:]
+
+[ClientGetLog:1111111111:12146824497]
+
+
+Test:
+[ClientGetServerStatus:2146824497:]
+[ClientGetHistoryFromDB:2146824497,begin_millisecond_value,end_millisecond_value, numlocations]
+[CleanUpDB:2]
+
+
+retString example:
+retString is the Extracted String:->[FMPRSP:0 0]
+PH:
+DE:
+BA:99
+CH:AC
+MD:OFF
+GP:ON
+NW:ON
+TK:OFF
+LOC:1 <gps 2015/10/16 07:14:27 33.0738 -96.7236 8 237 2 0>
+	-components:
+		-
+		-
+		-
+		-
+		-
+		-
+		-
+		-
+LOC:2 <network 2015/10/16 07:14:25 33.0740 -96.7235 24 0 0>
+	-components:
+		- "<network " ==> provider/ type of method that location was gotten from
+		- "2015/10/16 07:14:25" ==> Date object
+		-  33.0740 ==> latitude
+		-  -96.7235==> longitude
+		-  24 ==> accuracy, less accurate than gps 
+		-  0 ==> bearing
+		-  0 ==> speed
+WF:ENC <<Yeah5>>
+<-

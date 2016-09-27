@@ -1,0 +1,35 @@
+FindMyFamily phones and server communicate back and forth	FMF <---> Server <-- FMP
+FindMyPHone phones send locationo back to server every 5 minutes.	
+When FindMyFamily phones want to find location, they send request to the server ==> 
+
+
+
+Main --> MainOfficeServer --> MainOfficeCommServer>CommServerEngine --> MainOfficeHandler>TcpDataCommunication
+
+1. Main creates a new MainOfficeServer object
+2. MainOfficeServer starts a MainOfficeCommServer(false,ipPort), which is a subclass of CommServerEngine, which is a subclass of Thread
+	-Thread unsecComm = new MainOfficeCommServer(false,ipPort);
+	-parameters: CommServerEngine (boolean secured, int portNumber)
+	-Thus, we create a new CommServerEngine that is UNSERCURED with portnumber ipPort
+3. unsecComm.start() ==> calls run() method
+4. run() method:
+	- Creates a regular unsecured socket 
+5. unsecuredCommHandler(incoming)
+	-Creates a MainOfficeHandler using the Socket we created 
+	-Creates a new Thread that takes the MainOfficeHandler as a parameter
+	-Starts the thread
+
+6.MainOfficeHandler 
+	-extends TcpDataCommunication
+	-MainOfficeHandler(Socket soc)
+		-calls super(soc)
+		-TcpDataCommunication(Socket mSocket)
+			-takes in the Socket
+			-calls setBuilders()
+				-Creates a PrintWriter and BufferedWriter object from the Socket's OutputStream
+				-Creates a BufferedReader object from the Socket's InputStream
+			
+7. Back to the Thread that takes MainOfficeHandler as a parameter. Now it calls Thread.start() ==> call MainOfficeHandler's run()
+	-
+	
+	

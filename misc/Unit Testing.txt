@@ -1,0 +1,100 @@
+[TargetKAlive:0:+14696646540]
+[FMPRSP:0 0]
+PH:
+DE:
+BA:99
+CH:AC
+MD:OFF
+GP:ON
+NW:ON
+TK:OFF
+LOC:1 <gps 2015/10/16 07:14:27 33.0738 -96.7236 8 237 2 0>
+LOC:2 <network 2015/10/16 07:14:25 33.0740 -96.7235 24 0 0>
+WF:ENC <<Yeah5>>
+[TargetResponseEnd]
+
+[TargetKAlive:0:+12146824497]
+[FMPRSP:0 0]
+PH:
+DE:
+BA:99
+CH:AC
+MD:OFF
+GP:ON
+NW:ON
+TK:OFF
+LOC:1 <gps 2016/09/22 07:14:27 33.0738 -96.7236 8 237 2 0>
+LOC:2 <network 2016/09/22 07:14:25 33.0740 -96.7235 24 0 0>
+WF:ENC <<Yeah5>>
+[TargetResponseEnd]
+
+[TargetKAlive:0:+12146824497]
+[FMPRSP:0 0]
+PH:
+DE:
+BA:99
+CH:AC
+MD:OFF
+GP:ON
+NW:ON
+TK:OFF
+LOC:1 <gps 2016/08/20 12:14:22 33.0738 -96.7236 8 237 2 0>
+LOC:2 <network 2016/08/20 03:14:12 33.0740 -96.7235 24 0 0>
+WF:ENC <<Yeah5>>
+[TargetResponseEnd]
+
+[TargetKAlive:0:+12146824497]
+[FMPRSP:0 0]
+PH:
+DE:
+BA:99
+CH:AC
+MD:OFF
+GP:ON
+NW:ON
+TK:OFF
+LOC:1 <gps 2016/08/21 12:14:22 33.0738 -96.7236 8 237 2 0>
+LOC:2 <network 2016/08/21 03:14:12 33.0740 -96.7235 24 0 0>
+WF:ENC <<Yeah5>>
+[TargetResponseEnd]
+
+[TargetKAlive:0:+12146824497]
+[FMPRSP:0 0]
+PH:
+DE:
+BA:99
+CH:AC
+MD:OFF
+GP:ON
+NW:ON
+TK:OFF
+LOC:1 <gps 2016/08/22 12:14:22 33.0738 -96.7236 8 237 2 0>
+LOC:2 <network 2016/08/22 03:14:12 33.0740 -96.7235 24 0 0>
+WF:ENC <<Yeah5>>
+[TargetResponseEnd]
+
+[ClientGetServerStatus:2146824497:]
+[ClientGetHistoryFromDB:0:2146824497:1445000000000,1469600180000,-3]
+[ClientGetHistoryFromDB:0:2146824497:1445000000000,1469600180000,0]
+[ClientGetHistoryFromDB:0:2146824497:1445000000000,1469600180000,1]
+[ClientGetHistoryFromDB:0:2146824497:1445000000000,1469600180000,2]
+[ClientGetHistoryFromDB:0:2146824497:1445000000000,1469600180000,3]
+[ClientGetHistoryFromDB:0:2146824497:1445000000000,1469600180000,20]
+[CleanUpDB:2]
+
+
+//huge wifi block on database test
+
+[TargetKAlive:0:+12144773946]
+[FMPRSP:0 0]
+PH:
+DE:
+BA:91
+MD:ON
+GP:ON
+NW:ON
+TK:OFF
+LOC:1 <gps 2016/07/27 10:02:18 32.9750 -96.7240 32 355 2 12>
+LOC:2 <network 2016/07/27 11:04:00 32.9748 -96.7241 50 0 0>
+WF:ECG <mrmc-clinical1,MHS-mobile,mhs-physician,mhs-wireless,cisco-wireless,mhs-physician,mrmc-clinical1,mhs-wireless,mrmc-clinical1,mhs-wireless,cisco-wireless,MHS-mobile,mhs-physician,mhs-physician,mrmc-clinical1,mhs-wireless,mrmc-guest,mrmc-guest,mrmc-guest,mrmc-guest,TWCWiFi,TWCWiFi-Passpoint,CableWiFi,cisco-wireless,mhs-wireless,mhs-physician,mhs-physician,mhs-wireless,TWCWiFi-Passpoint,mrmc-guest,CableWiFi>
+[TargetResponseEnd]
